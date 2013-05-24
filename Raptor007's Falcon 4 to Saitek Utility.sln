@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Raptor007's Falcon 4 to Saitek Utility", "Raptor007's Falcon 4 to Saitek Utility\Raptor007's Falcon 4 to Saitek Utility.vcproj", "{DA4AC1A7-00C5-41B8-8F5B-DA80BC7F55AE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Form Designer|Win32 = Form Designer|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA4AC1A7-00C5-41B8-8F5B-DA80BC7F55AE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DA4AC1A7-00C5-41B8-8F5B-DA80BC7F55AE}.Debug|Win32.Build.0 = Debug|Win32
+		{DA4AC1A7-00C5-41B8-8F5B-DA80BC7F55AE}.Form Designer|Win32.ActiveCfg = Form Designer|Win32
+		{DA4AC1A7-00C5-41B8-8F5B-DA80BC7F55AE}.Form Designer|Win32.Build.0 = Form Designer|Win32
+		{DA4AC1A7-00C5-41B8-8F5B-DA80BC7F55AE}.Release|Win32.ActiveCfg = Release|Win32
+		{DA4AC1A7-00C5-41B8-8F5B-DA80BC7F55AE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
