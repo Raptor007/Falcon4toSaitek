@@ -1,14 +1,19 @@
-#include "stdafx.h"
 #include "Device.h"
 #include <cmath>
 #include <fstream>
 #include "Saitek.h"
 #include "Str.h"
+#include "MainForm.h"
+#include "EditConfigForm.h"
 
 
 Device::Device( GUID guid )
 {
 	Guid = guid;
+}
+
+Device::~Device()
+{
 }
 
 const char *Device::TypeString( void )
@@ -30,13 +35,23 @@ DeviceConfig::DeviceConfig( GUID guid ) : Device( guid )
 	SleepMs = 1000;
 }
 
+DeviceConfig::~DeviceConfig()
+{
+}
+
+void DeviceConfig::Clear( void )
+{
+}
+
 void DeviceConfig::Load( void )
 {
+	Clear();
+	
 	std::string filename = std::string("Configs\\") + Name + std::string(".cfg");
 	std::ifstream config_file( filename.c_str() );
 	if( ! config_file.good() )
 	{
-		System::Windows::Forms::MessageBox::Show( "Couldn't load: " + gcnew String(filename.c_str()), "Couldn't Load Settings", MessageBoxButtons::OK, MessageBoxIcon::Error );
+		System::Windows::Forms::MessageBox::Show( "Couldn't load: " + gcnew System::String(filename.c_str()), "Couldn't Load Settings", System::Windows::Forms::MessageBoxButtons::OK, System::Windows::Forms::MessageBoxIcon::Error );
 		return;
 	}
 
@@ -56,7 +71,7 @@ void DeviceConfig::Save( void )
 	FILE *config_file = fopen( filename.c_str(), "wt" );
 	if( ! config_file )
 	{
-		System::Windows::Forms::MessageBox::Show( "Couldn't save: " + gcnew String(filename.c_str()), "Couldn't Save Settings", MessageBoxButtons::OK, MessageBoxIcon::Error );
+		System::Windows::Forms::MessageBox::Show( "Couldn't save: " + gcnew System::String(filename.c_str()), "Couldn't Save Settings", System::Windows::Forms::MessageBoxButtons::OK, System::Windows::Forms::MessageBoxIcon::Error );
 		return;
 	}
 
@@ -106,8 +121,41 @@ void DeviceConfig::SaveLines( FILE *config_file )
 {
 }
 
-void DeviceConfig::ShowEditWindow( Raptor007sFalcon4toSaitekUtility::MainForm ^main_form )
+void DeviceConfig::ShowEditWindow( void )
 {
+	Raptor007sFalcon4toSaitekUtility::EditConfigForm ^edit_window = gcnew Raptor007sFalcon4toSaitekUtility::EditConfigForm();
+	
+	// Set the titlebar text to the config name, which we'll use to save it later.
+	edit_window->Text = gcnew System::String( Name.c_str() );
+	
+	// Make sure the latest config is written to file (especially useful on first run).
+	Save();
+	
+	// Load config data from file.
+	edit_window->ConfigText->Clear();
+	std::string filename = std::string("Configs\\") + Name + std::string(".cfg");
+	std::ifstream config_file( filename.c_str() );
+	if( config_file.good() )
+	{
+		bool found_device = false;
+		while( config_file.good() )
+		{
+			char line[ 1024 ] = "";
+			config_file.getline( line, 1023 );
+			
+			if( found_device && (strlen(line) || edit_window->ConfigText->Lines->Length) )
+				edit_window->ConfigText->Text += gcnew System::String(line) + gcnew System::String("\r\n");
+			else if( strncmp( line, "device ", strlen("device ") ) == 0 )
+				found_device = true;
+		}
+		config_file.close();
+	}
+	
+	// Hide the Apply button until they've changed something.
+	edit_window->ApplyButton->Enabled = false;
+	
+	// Show edit window.
+	edit_window->Show();
 }
 
 
@@ -115,6 +163,10 @@ DeviceInstance::DeviceInstance( void *saitek_device, DeviceConfig *config, GUID 
 {
 	SaitekDevice = saitek_device;
 	Config = config;
+}
+
+DeviceInstance::~DeviceInstance()
+{
 }
 
 void DeviceInstance::Begin( void ){}
@@ -138,6 +190,10 @@ LEDLook::LEDLook( void )
 	BlinkRate = 0.;
 }
 
+LEDLook::~LEDLook()
+{
+}
+
 LEDCondition::LEDCondition( int type, char color, double blink_rate )
 {
 	Type = type;
@@ -145,10 +201,18 @@ LEDCondition::LEDCondition( int type, char color, double blink_rate )
 	Look.BlinkRate = blink_rate;
 }
 
+LEDCondition::~LEDCondition()
+{
+}
+
 LED::LED( void )
 {
 	IndexR = -1;
 	IndexG = -1;
+}
+
+LED::~LED()
+{
 }
 
 void LED::SetIndices( int index_r, int index_g )

@@ -55,6 +55,7 @@ namespace Raptor007sFalcon4toSaitekUtility {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(X52ProConfigForm::typeid));
 			this->SuspendLayout();
 			// 
 			// X52ProConfigForm
@@ -62,6 +63,7 @@ namespace Raptor007sFalcon4toSaitekUtility {
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(284, 262);
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
 			this->Name = L"X52ProConfigForm";
 			this->Text = L"X52 Pro";
 			this->Load += gcnew System::EventHandler(this, &X52ProConfigForm::X52ProConfigForm_Load);

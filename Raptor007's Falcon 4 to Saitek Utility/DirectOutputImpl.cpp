@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "DirectOutputImpl.h"
 
 CDirectOutput::CDirectOutput() : 

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "FalconThread.h"
 #include "DeviceThread.h"
 #include "Saitek.h"
@@ -25,20 +24,20 @@ void FalconThread::Code( void )
 		FD = gcnew F4SharedMem::FlightData();
 	
 	// If we've set it to auto-launch Falcon, do so now.
-	if( Config.AutoLaunch && (Config.FalconPath->Length > 0) )
+	if( Config.AutoLaunch && (Config.FalconPaths[ Config.FalconType ]->Length > 0) )
 	{
 		// Keep track of the working directory.
-		String ^working_dir = System::Environment::CurrentDirectory;
+		System::String ^working_dir = System::Environment::CurrentDirectory;
 		
 		// Set the working directory for launching Falcon.
 		int index = -1, temp_index = -1;
-		while( (temp_index = Config.FalconPath->IndexOf( '\\', temp_index + 1 )) >= 0 )
+		while( (temp_index = Config.FalconPaths[ Config.FalconType ]->IndexOf( '\\', temp_index + 1 )) >= 0 )
 			index = temp_index;
 		if( index >= 0 )
-			System::Environment::CurrentDirectory = Config.FalconPath->Substring( 0, index );
+			System::Environment::CurrentDirectory = Config.FalconPaths[ Config.FalconType ]->Substring( 0, index );
 		
 		// Launch Falcon.
-		System::Diagnostics::Process ^falcon_process = System::Diagnostics::Process::Start( Config.FalconPath, Config.FalconParameters );
+		System::Diagnostics::Process ^falcon_process = System::Diagnostics::Process::Start( Config.FalconPaths[ Saitek::MainThread->Config.FalconType ], Config.FalconParameters[ Saitek::MainThread->Config.FalconType ] );
 		
 		// Restore the working directory.
 		System::Environment::CurrentDirectory = working_dir;
@@ -73,6 +72,7 @@ void FalconThread::Code( void )
 			System::Threading::ThreadStart ^thread_start = gcnew System::Threading::ThreadStart( device_thread, &(DeviceThread::Code) );
 			System::Threading::Thread ^thread = gcnew System::Threading::Thread( thread_start );
 			thread->Start();
+			//thread->Priority = System::Threading::ThreadPriority::AboveNormal;
 		}
 	}
 	
@@ -96,7 +96,7 @@ void FalconThread::Code( void )
 			}
 			catch( ... ){}
 			
-			// Sleep a little is Falcon is running.
+			// Sleep a little if Falcon is running.
 			System::Threading::Thread::Sleep( 100 );
 		}
 		else

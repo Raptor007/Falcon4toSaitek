@@ -9,6 +9,11 @@
 #include "Device.h"
 #include "FalconThread.h"
 
+namespace Raptor007sFalcon4toSaitekUtility
+{
+	ref class MainForm;
+}
+
 namespace Saitek
 {
 	extern FalconOutput Output;
@@ -21,12 +26,15 @@ namespace Saitek
 	extern bool InstancesChanged;
 	
 	extern std::map<std::string, DeviceConfig*> Configs;
+	extern bool ConfigsChanged;
 	
 	extern msclr::auto_gcroot<FalconThread^> MainThread;
 	
 	
 	void GenerateDefaults( void );
 	void LoadConfigs( void );
+	void LoadConfig( std::string name );
+	DeviceConfig *NewConfig( std::string guid );
 	void SaveConfigs( void );
 	void Initialize( void );
 	void Deinitialize( void );

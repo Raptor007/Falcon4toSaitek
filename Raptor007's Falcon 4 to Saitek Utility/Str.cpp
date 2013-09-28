@@ -2,7 +2,6 @@
  *  Str.cpp
  */
 
-#include "stdafx.h"
 #include "Str.h"
 #include <cstdlib>
 #include <cstring>
@@ -20,7 +19,6 @@ char *CStr::Copy( const char *str )
 void CStr::Delete( char *str )
 {
 	if( str )
-		//delete[] str;
 		free( str );
 }
 
@@ -28,7 +26,7 @@ void CStr::Delete( char *str )
 int CStr::Count( const char *str, const char *sub )
 {
 	int count = 0;
-	while( str = strstr( str, sub ) )
+	while( (str = strstr( str, sub )) )
 		count ++;
 	return count;
 }
@@ -91,6 +89,17 @@ int CStr::FindInsensitive( const char *str, const char *search_for )
 }
 
 
+bool CStr::Less::operator()( const char *a, const char *b ) const
+{
+	if( ! b )
+		return false;
+	if( ! a )
+		return true;
+	
+	return (strcmp( a, b ) < 0);
+}
+
+
 std::string CStr::Escape( const char *str, const char *original, const char *escaped )
 {
 	std::string return_str;
@@ -148,6 +157,23 @@ std::string CStr::Unescape( const char *str, const char *original, const char *e
 	}
 	
 	return return_str;
+}
+
+
+void CStr::ReplaceChars( char *str, const char *find, const char *replace )
+{
+	if( str && find && replace && (strlen(find) == strlen(replace)) )
+	{
+		char *str_ptr = str;
+		while( *str_ptr != '\0' )
+		{
+			const char *found_char = strchr( find, *str_ptr );
+			if( found_char )
+				*str_ptr = replace[ found_char - find ];
+			
+			str_ptr ++;
+		}
+	}
 }
 
 
@@ -272,7 +298,7 @@ std::list<std::string> CStr::ParseCommand( const char *cmd, const char *original
 			}
 			else
 			{
-				for( int i = 0; i < strlen(DELIMITERS); i ++ )
+				for( size_t i = 0; i < strlen(DELIMITERS); i ++ )
 				{
 					char *this_end_ptr = strchr( buffer_ptr, DELIMITERS[ i ] );
 					if( this_end_ptr && ((! end_ptr) || (this_end_ptr < end_ptr)) )

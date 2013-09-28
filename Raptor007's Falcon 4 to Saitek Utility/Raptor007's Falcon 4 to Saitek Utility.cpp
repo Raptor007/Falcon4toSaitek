@@ -1,6 +1,5 @@
 // Raptor007's Falcon 4 to Saitek Utility.cpp : main project file.
 
-#include "stdafx.h"
 #include "MainForm.h"
 #include "Saitek.h"
 

@@ -1,13 +1,12 @@
 #pragma once
-
 namespace Raptor007sFalcon4toSaitekUtility
 {
 	ref class MainForm;
 }
 
 #ifndef FORM_DESIGNER
-// FIXME: For some reason the form designer is broken if we include this header!
 #include "Saitek.h"
+#include "NewConfigForm.h"
 #endif
 
 using namespace System;
@@ -72,6 +71,8 @@ namespace Raptor007sFalcon4toSaitekUtility
 	private: System::Windows::Forms::Label^  ConfigName;
 	private: System::Windows::Forms::Label^  ConfigType;
 	private: System::Windows::Forms::PictureBox^  ConfigImage;
+	private: System::Windows::Forms::Button^  NewConfigButton;
+	private: System::Windows::Forms::Button^  DeleteConfigButton;
 
 
 	private:
@@ -87,6 +88,7 @@ namespace Raptor007sFalcon4toSaitekUtility
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(MainForm::typeid));
 			this->InstanceGroup = (gcnew System::Windows::Forms::GroupBox());
 			this->SelectedConfig = (gcnew System::Windows::Forms::ComboBox());
 			this->GuidText = (gcnew System::Windows::Forms::TextBox());
@@ -94,6 +96,8 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->DeviceText = (gcnew System::Windows::Forms::Label());
 			this->InstanceListBox = (gcnew System::Windows::Forms::ListBox());
 			this->ConfigGroup = (gcnew System::Windows::Forms::GroupBox());
+			this->DeleteConfigButton = (gcnew System::Windows::Forms::Button());
+			this->NewConfigButton = (gcnew System::Windows::Forms::Button());
 			this->ConfigImage = (gcnew System::Windows::Forms::PictureBox());
 			this->ConfigType = (gcnew System::Windows::Forms::Label());
 			this->ConfigName = (gcnew System::Windows::Forms::Label());
@@ -138,6 +142,7 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->SelectedConfig->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
 			this->SelectedConfig->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
+			this->SelectedConfig->Enabled = false;
 			this->SelectedConfig->FormattingEnabled = true;
 			this->SelectedConfig->Location = System::Drawing::Point(80, 216);
 			this->SelectedConfig->Name = L"SelectedConfig";
@@ -194,6 +199,8 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->ConfigGroup->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom) 
 				| System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
+			this->ConfigGroup->Controls->Add(this->DeleteConfigButton);
+			this->ConfigGroup->Controls->Add(this->NewConfigButton);
 			this->ConfigGroup->Controls->Add(this->ConfigImage);
 			this->ConfigGroup->Controls->Add(this->ConfigType);
 			this->ConfigGroup->Controls->Add(this->ConfigName);
@@ -205,6 +212,27 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->ConfigGroup->TabIndex = 1;
 			this->ConfigGroup->TabStop = false;
 			this->ConfigGroup->Text = L"Configurations:";
+			// 
+			// DeleteConfigButton
+			// 
+			this->DeleteConfigButton->Enabled = false;
+			this->DeleteConfigButton->Location = System::Drawing::Point(235, 214);
+			this->DeleteConfigButton->Name = L"DeleteConfigButton";
+			this->DeleteConfigButton->Size = System::Drawing::Size(50, 23);
+			this->DeleteConfigButton->TabIndex = 6;
+			this->DeleteConfigButton->Text = L"&Delete";
+			this->DeleteConfigButton->UseVisualStyleBackColor = true;
+			this->DeleteConfigButton->Click += gcnew System::EventHandler(this, &MainForm::DeleteConfigButton_Click);
+			// 
+			// NewConfigButton
+			// 
+			this->NewConfigButton->Location = System::Drawing::Point(123, 214);
+			this->NewConfigButton->Name = L"NewConfigButton";
+			this->NewConfigButton->Size = System::Drawing::Size(50, 23);
+			this->NewConfigButton->TabIndex = 4;
+			this->NewConfigButton->Text = L"&New";
+			this->NewConfigButton->UseVisualStyleBackColor = true;
+			this->NewConfigButton->Click += gcnew System::EventHandler(this, &MainForm::NewConfigButton_Click);
 			// 
 			// ConfigImage
 			// 
@@ -238,11 +266,12 @@ namespace Raptor007sFalcon4toSaitekUtility
 			// EditConfigButton
 			// 
 			this->EditConfigButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-			this->EditConfigButton->Location = System::Drawing::Point(236, 214);
+			this->EditConfigButton->Enabled = false;
+			this->EditConfigButton->Location = System::Drawing::Point(179, 214);
 			this->EditConfigButton->Name = L"EditConfigButton";
-			this->EditConfigButton->Size = System::Drawing::Size(49, 23);
-			this->EditConfigButton->TabIndex = 4;
-			this->EditConfigButton->Text = L"Edit";
+			this->EditConfigButton->Size = System::Drawing::Size(50, 23);
+			this->EditConfigButton->TabIndex = 5;
+			this->EditConfigButton->Text = L"&Edit";
 			this->EditConfigButton->UseVisualStyleBackColor = true;
 			this->EditConfigButton->Click += gcnew System::EventHandler(this, &MainForm::EditConfigButton_Click);
 			// 
@@ -258,6 +287,7 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->ConfigListBox->Size = System::Drawing::Size(279, 147);
 			this->ConfigListBox->TabIndex = 0;
 			this->ConfigListBox->SelectedIndexChanged += gcnew System::EventHandler(this, &MainForm::ConfigListBox_SelectedIndexChanged);
+			this->ConfigListBox->MouseEnter += gcnew System::EventHandler(this, &MainForm::ConfigListBox_Update);
 			// 
 			// FalconGroup
 			// 
@@ -285,7 +315,7 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->FalconBrowseButton->Name = L"FalconBrowseButton";
 			this->FalconBrowseButton->Size = System::Drawing::Size(75, 23);
 			this->FalconBrowseButton->TabIndex = 6;
-			this->FalconBrowseButton->Text = L"Browse...";
+			this->FalconBrowseButton->Text = L"&Browse...";
 			this->FalconBrowseButton->UseVisualStyleBackColor = true;
 			this->FalconBrowseButton->Click += gcnew System::EventHandler(this, &MainForm::FalconBrowseButton_Click);
 			// 
@@ -293,7 +323,7 @@ namespace Raptor007sFalcon4toSaitekUtility
 			// 
 			this->FalconParametersLabel->AutoSize = true;
 			this->FalconParametersLabel->Enabled = false;
-			this->FalconParametersLabel->Location = System::Drawing::Point(20, 110);
+			this->FalconParametersLabel->Location = System::Drawing::Point(19, 110);
 			this->FalconParametersLabel->Name = L"FalconParametersLabel";
 			this->FalconParametersLabel->Size = System::Drawing::Size(136, 13);
 			this->FalconParametersLabel->TabIndex = 4;
@@ -304,9 +334,9 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->FalconParameters->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
 			this->FalconParameters->Enabled = false;
-			this->FalconParameters->Location = System::Drawing::Point(154, 107);
+			this->FalconParameters->Location = System::Drawing::Point(155, 107);
 			this->FalconParameters->Name = L"FalconParameters";
-			this->FalconParameters->Size = System::Drawing::Size(357, 20);
+			this->FalconParameters->Size = System::Drawing::Size(356, 20);
 			this->FalconParameters->TabIndex = 5;
 			this->FalconParameters->TextChanged += gcnew System::EventHandler(this, &MainForm::FalconParameters_TextChanged);
 			// 
@@ -315,9 +345,9 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->FalconPath->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
 			this->FalconPath->Enabled = false;
-			this->FalconPath->Location = System::Drawing::Point(154, 81);
+			this->FalconPath->Location = System::Drawing::Point(155, 81);
 			this->FalconPath->Name = L"FalconPath";
-			this->FalconPath->Size = System::Drawing::Size(438, 20);
+			this->FalconPath->Size = System::Drawing::Size(437, 20);
 			this->FalconPath->TabIndex = 3;
 			this->FalconPath->TextChanged += gcnew System::EventHandler(this, &MainForm::FalconPath_TextChanged);
 			// 
@@ -328,7 +358,7 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->AutoLaunch->Name = L"AutoLaunch";
 			this->AutoLaunch->Size = System::Drawing::Size(151, 17);
 			this->AutoLaunch->TabIndex = 2;
-			this->AutoLaunch->Text = L"Automatically Start Falcon:";
+			this->AutoLaunch->Text = L"&Automatically Start Falcon:";
 			this->AutoLaunch->UseVisualStyleBackColor = true;
 			this->AutoLaunch->CheckedChanged += gcnew System::EventHandler(this, &MainForm::AutoLaunch_CheckedChanged);
 			// 
@@ -336,8 +366,8 @@ namespace Raptor007sFalcon4toSaitekUtility
 			// 
 			this->FalconType->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 			this->FalconType->FormattingEnabled = true;
-			this->FalconType->Items->AddRange(gcnew cli::array< System::Object^  >(5) {L"Allied Force", L"BMS2 / FreeFalcon / RedViper", 
-				L"BMS3", L"BMS4", L"OpenFalcon"});
+			this->FalconType->Items->AddRange(gcnew cli::array< System::Object^  >(6) {L"Allied Force", L"BMS2 / FreeFalcon4 / RedViper", 
+				L"BMS3", L"BMS4", L"OpenFalcon", L"FreeFalcon5"});
 			this->FalconType->Location = System::Drawing::Point(6, 19);
 			this->FalconType->Name = L"FalconType";
 			this->FalconType->Size = System::Drawing::Size(172, 21);
@@ -351,8 +381,8 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->WaitForFalcon->Name = L"WaitForFalcon";
 			this->WaitForFalcon->Size = System::Drawing::Size(461, 30);
 			this->WaitForFalcon->TabIndex = 1;
-			this->WaitForFalcon->Text = L"Wait for Falcon\r\nAfter clicking Start, nothing will happen on your Saitek devices" 
-				L" until after Falcon is launched.";
+			this->WaitForFalcon->Text = L"&Wait for Falcon\r\nAfter clicking Start, nothing will happen on your Saitek device" 
+				L"s until after Falcon is launched.";
 			this->WaitForFalcon->UseVisualStyleBackColor = true;
 			this->WaitForFalcon->CheckedChanged += gcnew System::EventHandler(this, &MainForm::WaitForFalcon_CheckedChanged);
 			// 
@@ -363,7 +393,7 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->StartButton->Name = L"StartButton";
 			this->StartButton->Size = System::Drawing::Size(75, 23);
 			this->StartButton->TabIndex = 5;
-			this->StartButton->Text = L"Start";
+			this->StartButton->Text = L"&Start";
 			this->StartButton->UseVisualStyleBackColor = true;
 			this->StartButton->Click += gcnew System::EventHandler(this, &MainForm::StartButton_Click);
 			// 
@@ -374,7 +404,7 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->RestartServiceButton->Name = L"RestartServiceButton";
 			this->RestartServiceButton->Size = System::Drawing::Size(129, 23);
 			this->RestartServiceButton->TabIndex = 3;
-			this->RestartServiceButton->Text = L"Restart DirectOutput";
+			this->RestartServiceButton->Text = L"&Restart DirectOutput";
 			this->RestartServiceButton->UseVisualStyleBackColor = true;
 			this->RestartServiceButton->Click += gcnew System::EventHandler(this, &MainForm::RestartServiceButton_Click);
 			// 
@@ -403,8 +433,9 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->Controls->Add(this->FalconGroup);
 			this->Controls->Add(this->ConfigGroup);
 			this->Controls->Add(this->InstanceGroup);
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
 			this->Name = L"MainForm";
-			this->Text = L"Raptor007\'s Falcon 4 to Saitek Utility 2.0 - TEST BUILD 2";
+			this->Text = L"Raptor007\'s Falcon 4 to Saitek Utility 2.0";
 			this->Load += gcnew System::EventHandler(this, &MainForm::MainForm_Load);
 			this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &MainForm::MainForm_FormClosing);
 			this->InstanceGroup->ResumeLayout(false);
@@ -421,18 +452,61 @@ namespace Raptor007sFalcon4toSaitekUtility
 #pragma endregion
 private: System::Void MainForm_Load( System::Object ^sender, System::EventArgs ^e )
 		{
+			// Select AlliedForce by default.
+			try
+			{
+				System::String ^alliedforce_param = Saitek::MainThread->Config.FalconParameters[ F4SharedMem::FalconDataFormats::AlliedForce ];
+				FalconType->SelectedIndex = 0;
+				Saitek::MainThread->Config.FalconParameters[ F4SharedMem::FalconDataFormats::AlliedForce ] = alliedforce_param;
+			}
+			catch( System::Collections::Generic::KeyNotFoundException^ )
+			{
+				FalconType->SelectedIndex = 0;
+			}
+
+			// Load all configs, including Falcon paths and selected type.
 			Saitek::LoadConfigs();
+			
+			// Keep track of the actual selected type, but set the config variable to AlliedForce temporarily.
+			F4SharedMem::FalconDataFormats falcon_type = Saitek::MainThread->Config.FalconType;
+			Saitek::MainThread->Config.FalconType = F4SharedMem::FalconDataFormats::AlliedForce;
+			
+			// Read AlliedForce path and params into textboxes.
+			try
+			{
+				FalconPath->Text = Saitek::MainThread->Config.FalconPaths[ F4SharedMem::FalconDataFormats::AlliedForce ];
+			}
+			catch( System::Collections::Generic::KeyNotFoundException^ ){}
+			
+			try
+			{
+				FalconParameters->Text = Saitek::MainThread->Config.FalconParameters[ F4SharedMem::FalconDataFormats::AlliedForce ];
+			}
+			catch( System::Collections::Generic::KeyNotFoundException^ ){}
+			
+			WaitForFalcon->Checked = Saitek::MainThread->Config.WaitForFalcon;
+			AutoLaunch->Checked = Saitek::MainThread->Config.AutoLaunch;
+			
+			// Set dropdown to actual selected type.
+			if( falcon_type == F4SharedMem::FalconDataFormats::AlliedForce )
+				FalconType->SelectedIndex = 0;
+			else if( falcon_type == F4SharedMem::FalconDataFormats::BMS2 )
+				FalconType->SelectedIndex = 1;
+			else if( falcon_type == F4SharedMem::FalconDataFormats::BMS3 )
+				FalconType->SelectedIndex = 2;
+			else if( falcon_type == F4SharedMem::FalconDataFormats::BMS4 )
+				FalconType->SelectedIndex = 3;
+			else if( falcon_type == F4SharedMem::FalconDataFormats::OpenFalcon )
+				FalconType->SelectedIndex = 4;
+			else if( falcon_type == F4SharedMem::FalconDataFormats::FreeFalcon5 )
+				FalconType->SelectedIndex = 5;
+			
+			Saitek::ConfigsChanged = true;
 			ConfigListBox_Update( sender, e );
 			Saitek::Initialize();
 			InstanceListBox_Update( sender, e );
 			InstanceListBox_SelectedIndexChanged( sender, e );
 			ConfigListBox_SelectedIndexChanged( sender, e );
-			
-			FalconType->SelectedIndex = 0;
-			WaitForFalcon->Checked = Saitek::MainThread->Config.WaitForFalcon;
-			AutoLaunch->Checked = Saitek::MainThread->Config.AutoLaunch;
-			FalconPath->Text = Saitek::MainThread->Config.FalconPath;
-			FalconParameters->Text = Saitek::MainThread->Config.FalconParameters;
 		}
 private: System::Void StartButton_Click( System::Object ^sender, System::EventArgs ^e )
 		{
@@ -448,9 +522,9 @@ private: System::Void StartButton_Click( System::Object ^sender, System::EventAr
 				
 				RestartServiceButton->Enabled = true;
 				FalconType->Enabled = true;
-				SelectedConfig->Enabled = (InstanceListBox->SelectedIndex >= 0);
 				AutoLaunch->Enabled = true;
 				AutoLaunch_CheckedChanged( sender, e );
+				DeleteConfigButton->Enabled = EditConfigButton->Enabled;
 			}
 			else if( Saitek::Instances.size() )
 			{
@@ -469,12 +543,12 @@ private: System::Void StartButton_Click( System::Object ^sender, System::EventAr
 				
 				RestartServiceButton->Enabled = false;
 				FalconType->Enabled = false;
-				SelectedConfig->Enabled = false;
 				AutoLaunch->Enabled = false;
 				FalconPath->Enabled = false;
 				FalconBrowseButton->Enabled = false;
 				FalconParameters->Enabled = false;
 				FalconParametersLabel->Enabled = false;
+				DeleteConfigButton->Enabled = false;
 				
 				StartButton->Text = "Starting...";
 				StartButton->Enabled = false;
@@ -581,10 +655,17 @@ private: System::Void InstanceListBox_SelectedIndexChanged( System::Object ^send
 		}
 private: System::Void ConfigListBox_Update( System::Object ^sender, System::EventArgs ^e )
 		{
-			ConfigListBox->Items->Clear();
-			for( std::map<std::string, DeviceConfig*>::iterator cfg_iter = Saitek::Configs.begin(); cfg_iter != Saitek::Configs.end(); cfg_iter ++ )
+			if( Saitek::ConfigsChanged )
 			{
-				ConfigListBox->Items->Add( gcnew System::String(cfg_iter->second->Name.c_str()) );
+				Saitek::ConfigsChanged = false;
+				
+				ConfigListBox->Items->Clear();
+				for( std::map<std::string, DeviceConfig*>::iterator cfg_iter = Saitek::Configs.begin(); cfg_iter != Saitek::Configs.end(); cfg_iter ++ )
+				{
+					ConfigListBox->Items->Add( gcnew System::String(cfg_iter->second->Name.c_str()) );
+				}
+				
+				InstanceListBox_SelectedIndexChanged( sender, e );
 			}
 		}
 private: System::Void ForumLink_LinkClicked( System::Object ^sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs ^e )
@@ -601,12 +682,15 @@ private: System::Void EditConfigButton_Click( System::Object ^sender, System::Ev
 			for( std::map<std::string, DeviceConfig*>::iterator cfg_iter = Saitek::Configs.begin(); cfg_iter != Saitek::Configs.end(); cfg_iter ++ )
 			{
 				if( index == ConfigListBox->SelectedIndex )
-					cfg_iter->second->ShowEditWindow( this );
+					cfg_iter->second->ShowEditWindow();
 				index ++;
 			}
 		}
 private: System::Void FalconType_SelectedIndexChanged( System::Object ^sender, System::EventArgs ^e )
 		{
+			Saitek::MainThread->Config.FalconPaths[ Saitek::MainThread->Config.FalconType ] = FalconPath->Text;
+			Saitek::MainThread->Config.FalconParameters[ Saitek::MainThread->Config.FalconType ] = FalconParameters->Text;
+			
 			if( FalconType->SelectedIndex == 0 )
 				Saitek::MainThread->Config.FalconType = F4SharedMem::FalconDataFormats::AlliedForce;
 			else if( FalconType->SelectedIndex == 1 )
@@ -617,8 +701,28 @@ private: System::Void FalconType_SelectedIndexChanged( System::Object ^sender, S
 				Saitek::MainThread->Config.FalconType = F4SharedMem::FalconDataFormats::BMS4;
 			else if( FalconType->SelectedIndex == 4 )
 				Saitek::MainThread->Config.FalconType = F4SharedMem::FalconDataFormats::OpenFalcon;
+			else if( FalconType->SelectedIndex == 5 )
+				Saitek::MainThread->Config.FalconType = F4SharedMem::FalconDataFormats::FreeFalcon5;
 			else
 				Saitek::MainThread->Config.FalconType = F4SharedMem::FalconDataFormats::AlliedForce;
+			
+			try
+			{
+				FalconPath->Text = Saitek::MainThread->Config.FalconPaths[ Saitek::MainThread->Config.FalconType ];
+			}
+			catch( System::Collections::Generic::KeyNotFoundException^ )
+			{
+				FalconPath->Text = "";
+			}
+			
+			try
+			{
+				FalconParameters->Text = Saitek::MainThread->Config.FalconParameters[ Saitek::MainThread->Config.FalconType ];
+			}
+			catch( System::Collections::Generic::KeyNotFoundException^ )
+			{
+				FalconParameters->Text = "";
+			}
 		}
 private: System::Void SelectedConfig_SelectedIndexChanged( System::Object ^sender, System::EventArgs ^e )
 		{
@@ -720,6 +824,7 @@ private: System::Void AutoLaunch_CheckedChanged( System::Object ^sender, System:
 				}
 				
 				EditConfigButton->Enabled = true;
+				DeleteConfigButton->Enabled = ! Saitek::MainThread->Running;
 			}
 			else
 			{
@@ -728,19 +833,78 @@ private: System::Void AutoLaunch_CheckedChanged( System::Object ^sender, System:
 				ConfigImage->ImageLocation = "Images/icon_unknown.png";
 				
 				EditConfigButton->Enabled = false;
+				DeleteConfigButton->Enabled = false;
 			}
 		}
 private: System::Void FalconPath_TextChanged( System::Object ^sender, System::EventArgs ^e )
 		{
-			Saitek::MainThread->Config.FalconPath = FalconPath->Text;
+			Saitek::MainThread->Config.FalconPaths[ Saitek::MainThread->Config.FalconType ] = FalconPath->Text;
 		}
 private: System::Void FalconParameters_TextChanged( System::Object ^sender, System::EventArgs ^e )
 		{
-			Saitek::MainThread->Config.FalconParameters = FalconParameters->Text;
+			Saitek::MainThread->Config.FalconParameters[ Saitek::MainThread->Config.FalconType ] = FalconParameters->Text;
 		}
 private: System::Void MainForm_FormClosing( System::Object ^sender, System::Windows::Forms::FormClosingEventArgs ^e )
 		{
 			Saitek::SaveConfigs();
+		}
+private: System::Void NewConfigButton_Click( System::Object ^sender, System::EventArgs ^e )
+		{
+			Raptor007sFalcon4toSaitekUtility::NewConfigForm ^new_window = gcnew Raptor007sFalcon4toSaitekUtility::NewConfigForm();
+			new_window->Show();
+		}
+private: System::Void DeleteConfigButton_Click( System::Object ^sender, System::EventArgs ^e )
+		{
+			std::string cfg_name;
+			
+			int index = 0;
+			for( std::map<std::string, DeviceConfig*>::iterator cfg_iter = Saitek::Configs.begin(); cfg_iter != Saitek::Configs.end(); cfg_iter ++ )
+			{
+				if( index == ConfigListBox->SelectedIndex )
+					cfg_name = cfg_iter->second->Name;
+				index ++;
+			}
+			
+			if( cfg_name.size() )
+			{
+				System::Windows::Forms::DialogResult result = System::Windows::Forms::MessageBox::Show( "Are you sure you want to delete " + gcnew System::String(cfg_name.c_str()) + ".cfg?", "Really Delete " + gcnew System::String(cfg_name.c_str()) + ".cfg?", System::Windows::Forms::MessageBoxButtons::YesNo, System::Windows::Forms::MessageBoxIcon::Exclamation );
+				if( result == System::Windows::Forms::DialogResult::Yes )
+				{
+					std::map< std::string, DeviceConfig* >::iterator cfg_iter = Saitek::Configs.find(cfg_name);
+					if( cfg_iter != Saitek::Configs.end() )
+					{
+						// Lock threads while we muck about.
+						Saitek::InstancesLock->WaitOne();
+						
+						// Unassign the config from any instances using it.
+						for( std::vector<DeviceInstance*>::iterator inst_iter = Saitek::Instances.begin(); inst_iter != Saitek::Instances.end(); inst_iter ++ )
+						{
+							if( (*inst_iter)->Config == cfg_iter->second )
+								(*inst_iter)->Config = NULL;
+						}
+						
+						// Release thread lock.
+						Saitek::InstancesLock->ReleaseMutex();
+						
+						delete cfg_iter->second;
+						cfg_iter->second = NULL;
+						Saitek::Configs.erase( cfg_iter );
+					}
+					
+					Saitek::ConfigsChanged = true;
+					
+					try
+					{
+						ConfigListBox->SelectedIndex = -1;
+					}
+					catch( ... ){}
+					
+					ConfigListBox_Update( sender, e );
+					
+					std::string cmd = std::string("move \"Configs\\") + cfg_name + std::string(".cfg\" \"Configs\\") + cfg_name + std::string(".bak\"");
+					system( cmd.c_str() );
+				}
+			}
 		}
 };
 }

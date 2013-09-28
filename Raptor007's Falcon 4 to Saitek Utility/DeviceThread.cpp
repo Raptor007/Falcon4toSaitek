@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "DeviceThread.h"
 #include "Clock.h"
 

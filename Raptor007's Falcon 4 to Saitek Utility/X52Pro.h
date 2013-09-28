@@ -1,5 +1,4 @@
 #pragma once
-
 class X52ProInstance;
 class X52ProConfig;
 class X52ProPage;
@@ -65,6 +64,7 @@ class X52ProInstance : public DeviceInstance
 {
 public:
 	X52ProInstance( void *saitek_device, X52ProConfig *config );
+	virtual ~X52ProInstance();
 	
 	const char *TypeString( void );
 	
@@ -81,6 +81,7 @@ public:
 	int Texts[ 3 ];
 
 	X52ProPage( void );
+	virtual ~X52ProPage();
 };
 
 
@@ -92,12 +93,13 @@ public:
 
 	X52ProConfig( void );
 	X52ProConfig( std::string config_name );
+	virtual ~X52ProConfig();
 	
 	const char *TypeString( void );
 	
 	void Initialize();
-	void SetDefaults();
+	void Clear();
 	void LoadLine( std::vector<std::string> cmd_tokens );
 	void SaveLines( FILE *config_file );
-	void ShowEditWindow( Raptor007sFalcon4toSaitekUtility::MainForm ^main_form );
+	//void ShowEditWindow( void );
 };

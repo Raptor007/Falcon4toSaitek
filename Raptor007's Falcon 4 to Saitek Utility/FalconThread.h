@@ -1,4 +1,5 @@
 #pragma once
+ref class FalconThread;
 
 #include "FalconConfig.h"
 

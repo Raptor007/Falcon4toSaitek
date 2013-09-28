@@ -1,4 +1,5 @@
 #pragma once
+class CDirectOutput;
 
 #pragma comment( lib, "advapi32.lib" )
 #define WIN32_LEAN_AND_MEAN

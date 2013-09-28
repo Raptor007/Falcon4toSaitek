@@ -45,9 +45,10 @@
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4800;4244;4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -121,9 +122,10 @@
 				FavorSizeOrSpeed="1"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4800;4244;4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -193,11 +195,12 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;FORM_DESIGNER&quot;"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;FORM_DESIGNER"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4800;4244;4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -275,9 +278,9 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			Name="Sources"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
 				RelativePath=".\AssemblyInfo.cpp"
@@ -288,109 +291,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Device.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DeviceThread.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DirectOutputImpl.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FalconConfig.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FalconOutput.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FalconThread.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FIP.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FIPBitmap.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\gettimeofday.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\iTunesCOMInterface_i.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MainForm.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Raptor007&apos;s Falcon 4 to Saitek Utility.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Saitek.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Form Designer|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Str.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\X52Pro.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\X52ProConfigForm.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
 				RelativePath=".\Clock.h"
 				>
 			</File>
 			<File
+				RelativePath=".\Device.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Device.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DeviceThread.cpp"
 				>
 			</File>
 			<File
@@ -402,7 +315,28 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DirectOutputImpl.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DirectOutputImpl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EditConfigForm.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\EditConfigForm.h"
+				FileType="3"
+				>
+				<File
+					RelativePath=".\EditConfigForm.resx"
+					>
+				</File>
+			</File>
+			<File
+				RelativePath=".\FalconConfig.cpp"
 				>
 			</File>
 			<File
@@ -410,7 +344,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FalconOutput.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FalconOutput.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FalconThread.cpp"
 				>
 			</File>
 			<File
@@ -418,11 +360,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FIP.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FIP.h"
 				>
 			</File>
 			<File
+				RelativePath=".\FIPBitmap.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FIPBitmap.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gettimeofday.cpp"
 				>
 			</File>
 			<File
@@ -431,6 +385,14 @@
 			</File>
 			<File
 				RelativePath=".\iTunesCOMInterface.h"
+				>
+			</File>
+			<File
+				RelativePath=".\iTunesCOMInterface_i.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MainForm.cpp"
 				>
 			</File>
 			<File
@@ -444,7 +406,40 @@
 				</File>
 			</File>
 			<File
-				RelativePath=".\platforms.h"
+				RelativePath=".\Math2D.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Math2D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NewConfigForm.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\NewConfigForm.h"
+				FileType="3"
+				>
+				<File
+					RelativePath=".\NewConfigForm.resx"
+					>
+				</File>
+			</File>
+			<File
+				RelativePath=".\Num.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Num.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PlatformSpecific.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Raptor007&apos;s Falcon 4 to Saitek Utility.cpp"
 				>
 			</File>
 			<File
@@ -452,11 +447,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Saitek.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Saitek.h"
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.h"
+				RelativePath=".\Str.cpp"
 				>
 			</File>
 			<File
@@ -464,7 +463,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\X52Pro.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\X52Pro.h"
+				>
+			</File>
+			<File
+				RelativePath=".\X52ProConfigForm.cpp"
 				>
 			</File>
 			<File
@@ -478,16 +485,24 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Resource Files"
+			Name="Resources"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\app.ico"
+				RelativePath=".\f4saitek.rc"
 				>
 			</File>
 			<File
-				RelativePath=".\app.rc"
+				RelativePath=".\f4saitek_128.png"
+				>
+			</File>
+			<File
+				RelativePath=".\f4saitek_16.png"
+				>
+			</File>
+			<File
+				RelativePath=".\f4saitek_32.png"
 				>
 			</File>
 		</Filter>

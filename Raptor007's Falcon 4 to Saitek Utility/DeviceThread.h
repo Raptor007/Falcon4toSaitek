@@ -1,3 +1,6 @@
+#pragma once
+ref class DeviceThread;
+
 #include "Device.h"
 #include "FalconThread.h"
 

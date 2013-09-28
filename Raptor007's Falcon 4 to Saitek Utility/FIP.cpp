@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "FIP.h"
 #include <cstdlib>
 #include <cmath>
@@ -9,6 +8,10 @@
 FIPInstance::FIPInstance( void *saitek_device, FIPConfig *config ) : DeviceInstance( saitek_device, config, DeviceType_Fip )
 {
 	SelectedPage = 0;
+}
+
+FIPInstance::~FIPInstance()
+{
 }
 
 const char *FIPInstance::TypeString( void )
@@ -57,7 +60,7 @@ void FIPInstance::Update( F4SharedMem::FlightData ^fd, double total_time )
 	gfx->Clear( Color::Black );
 
 	// Draw the currently-selected page.
-	if( (SelectedPage >= 0) && (SelectedPage < Config->Pages.size()) )
+	if( (SelectedPage >= 0) && (SelectedPage < (int) Config->Pages.size()) )
 	{
 		FIPPage *page = Config->Pages.at( SelectedPage );
 
@@ -71,7 +74,7 @@ void FIPInstance::Update( F4SharedMem::FlightData ^fd, double total_time )
 	Brush ^selected_label_brush = gcnew SolidBrush( Color::White );
 	Font ^label_font = gcnew Font( FontFamily::GenericSansSerif, 10.f, FontStyle::Regular );
 	Font ^selected_label_font = gcnew Font( FontFamily::GenericSansSerif, 10.f, FontStyle::Bold );
-	for( int page_num = 0; page_num < Config->Pages.size(); page_num ++ )
+	for( size_t page_num = 0; page_num < Config->Pages.size(); page_num ++ )
 	{
 		FIPPage *page = Config->Pages.at( page_num );
 		Brush ^brush = label_brush;
@@ -102,7 +105,7 @@ void FIPInstance::Update( F4SharedMem::FlightData ^fd, double total_time )
 
 void FIPInstance::SetPage( int page )
 {
-	if( Config && ( page < ((FIPConfig*)( Config ))->Pages.size() ) )
+	if( Config && ( page < (int) ((FIPConfig*)( Config ))->Pages.size() ) )
 		SelectedPage = page;
 }
 
@@ -113,14 +116,101 @@ FIPConfig::FIPConfig( void ) : DeviceConfig( DeviceType_Fip )
 	SleepMs = 10;
 }
 
+FIPConfig::~FIPConfig()
+{
+	Clear();
+}
+
 const char *FIPConfig::TypeString( void )
 {
 	return "FIP";
 }
 
+void FIPConfig::Clear( void )
+{
+	for( std::vector<FIPPage*>::iterator page_iter = Pages.begin(); page_iter != Pages.end(); page_iter ++ )
+	{
+		delete *page_iter;
+		*page_iter = NULL;
+	}
+	
+	Pages.clear();
+}
+
+void FIPConfig::LoadLine( std::vector<std::string> cmd_tokens )
+{
+	if( cmd_tokens.size() < 3 )
+		return;
+	if( cmd_tokens[ 0 ] != "screen" )
+		return;
+	
+	int screen = atoi( cmd_tokens[ 1 ].c_str() ) - 1;
+	if( screen < 0 )
+		return;
+	
+	std::string cmd = cmd_tokens[ 2 ];
+	
+	while( (int) Pages.size() <= screen )
+		Pages.push_back( new FIPPage("") );
+	
+	if( (cmd == "label") && (cmd_tokens.size() >= 4) )
+	{
+		Pages[ screen ]->Label = cmd_tokens[ 3 ];
+	}
+	else if( (cmd == "led") && (cmd_tokens.size() >= 6) )
+	{
+		std::string condition_name = cmd_tokens[ 3 ];
+		int condition = Saitek::Output.GetCondition( condition_name );
+		std::string color_name = cmd_tokens[ 4 ];
+		int color = LEDColor::Off;
+		double blink_rate = atof( cmd_tokens[ 5 ].c_str() );
+		
+		if( color_name == "green" )
+			color = LEDColor::Green;
+		else if( color_name == "yellow" )
+			color = LEDColor::Yellow;
+		else if( color_name == "red" )
+			color = LEDColor::Red;
+		else if( color_name == "on" )
+			color = LEDColor::On;
+		else if( color_name == "off" )
+			color = LEDColor::Off;
+		
+		if( condition_name == "default" )
+		{
+			Pages[ screen ]->LED.DefaultLook.Color = color;
+			Pages[ screen ]->LED.DefaultLook.BlinkRate = blink_rate;
+		}
+		else
+			Pages[ screen ]->LED.Conditions.push_back( new LEDCondition( condition, color, blink_rate ) );
+	}
+	else if( (cmd == "image") && (cmd_tokens.size() >= 8) )
+	{
+		int image = Saitek::Output.GetImageType( cmd_tokens[ 3 ] );
+		int x = atoi( cmd_tokens[ 4 ].c_str() );
+		int y = atoi( cmd_tokens[ 5 ].c_str() );
+		int w = atoi( cmd_tokens[ 6 ].c_str() );
+		int h = atoi( cmd_tokens[ 7 ].c_str() );
+		
+		Pages[ screen ]->Layers.push_back( new FIPImage( image, x, y, w, h ) );
+	}
+	else if( (cmd == "text") && (cmd_tokens.size() >= 6) )
+	{
+		// FIXME: Allow variable fonts.
+		
+		int text = Saitek::Output.GetTextType( cmd_tokens[ 3 ] );
+		int x = atoi( cmd_tokens[ 4 ].c_str() );
+		int y = atoi( cmd_tokens[ 5 ].c_str() );
+		
+		System::Drawing::Font ^font = gcnew System::Drawing::Font( System::Drawing::FontFamily::GenericMonospace, 12.f, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Pixel );
+		System::Drawing::Brush ^brush = gcnew System::Drawing::SolidBrush( System::Drawing::Color::White );
+		Pages[ screen ]->Layers.push_back( new FIPText( text, x, y, font, brush ) );
+	}
+}
+
 void FIPConfig::SaveLines( FILE *config_file )
 {
-	for( int i = 0; i < Pages.size(); i ++ )
+	for( size_t i = 0; i < Pages.size(); i ++ )
 	{
 		const char *color = "off";
 		
@@ -135,8 +225,6 @@ void FIPConfig::SaveLines( FILE *config_file )
 				color = "on";
 				break;
 		}
-		
-		fprintf( config_file, "screen %i led default %s %.0f\n", i + 1, color, Pages[ i ]->LED.DefaultLook.BlinkRate );
 		
 		for( std::vector<LEDCondition*>::iterator cond_iter = Pages[ i ]->LED.Conditions.begin(); cond_iter != Pages[ i ]->LED.Conditions.end(); cond_iter ++ )
 		{
@@ -155,6 +243,8 @@ void FIPConfig::SaveLines( FILE *config_file )
 			fprintf( config_file, "screen %i led %s %s %.0f\n", i + 1, condition.c_str(), color, (*cond_iter)->Look.BlinkRate );
 		}
 		
+		fprintf( config_file, "screen %i led default %s %.0f\n", i + 1, color, Pages[ i ]->LED.DefaultLook.BlinkRate );
+		
 		for( std::vector<FIPLayer*>::iterator layer_iter = Pages[ i ]->Layers.begin(); layer_iter != Pages[ i ]->Layers.end(); layer_iter ++ )
 		{
 			switch( (*layer_iter)->Class )
@@ -168,9 +258,11 @@ void FIPConfig::SaveLines( FILE *config_file )
 				}
 				case FIPLayerClass::Text:
 				{
+					// FIXME: Allow variable fonts.
+					
 					FIPText *text = (FIPText*) *layer_iter;
 					std::string type = Saitek::Output.GetTextName( text->Type );
-					fprintf( config_file, "screen %i text %s %i %i monospace 12 white\n", i + 1, type.c_str(), text->X, text->Y );
+					fprintf( config_file, "screen %i text %s %i %i\n", i + 1, type.c_str(), text->X, text->Y );
 					break;
 				}
 			}
@@ -186,10 +278,18 @@ FIPPage::FIPPage( std::string label )
 	Label = label;
 }
 
+FIPPage::~FIPPage()
+{
+}
+
 
 FIPLayer::FIPLayer( void )
 {
 	Class = FIPLayerClass::Unknown;
+}
+
+FIPLayer::~FIPLayer()
+{
 }
 
 
@@ -201,6 +301,10 @@ FIPImage::FIPImage( int type, int x, int y, int w, int h )
 	Y = y;
 	W = w;
 	H = h;
+}
+
+FIPImage::~FIPImage()
+{
 }
 
 void FIPImage::Draw( F4SharedMem::FlightData ^fd, System::Drawing::Graphics ^gfx, double total_time )
@@ -217,6 +321,10 @@ FIPText::FIPText( int type, int x, int y, System::Drawing::Font ^font, System::D
 	Y = y;
 	TextFont = font;
 	TextBrush = brush;
+}
+
+FIPText::~FIPText()
+{
 }
 
 void FIPText::Draw( F4SharedMem::FlightData ^fd, System::Drawing::Graphics ^gfx, double total_time )

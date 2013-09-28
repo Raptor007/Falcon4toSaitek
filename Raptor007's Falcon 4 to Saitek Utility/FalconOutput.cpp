@@ -1,5 +1,7 @@
-#include "stdafx.h"
 #include "FalconOutput.h"
+#include "Math2D.h"
+#include "Num.h"
+#include "Saitek.h"
 #include <cmath>
 
 #ifndef M_PI_F
@@ -8,24 +10,95 @@
 #define TO_DEG(x) ((x) * 180.f / M_PI_F)
 #define TO_RAD(x) ((x) * M_PI_F / 180.f)
 
+using namespace System::Windows::Forms;
+using namespace System::Drawing;
+
 
 FalconOutput::FalconOutput( void )
 {
 	TextTypes[ "altitude" ] = TextType::Altitude;
-	TextTypes[ "nozzle" ] = TextType::Nozzle;
+	TextTypes[ "altitude_time" ] = TextType::AltitudeTime;
+	TextTypes[ "indicated_knots" ] = TextType::IndicatedKnots;
+	TextTypes[ "indicated_fps" ] = TextType::IndicatedFPS;
+	TextTypes[ "indicated_mph" ] = TextType::IndicatedMPH;
+	TextTypes[ "true_knots" ] = TextType::TrueKnots;
+	TextTypes[ "true_fps" ] = TextType::TrueFPS;
+	TextTypes[ "true_mph" ] = TextType::TrueMPH;
+	TextTypes[ "ground_knots" ] = TextType::GroundKnots;
+	TextTypes[ "ground_fps" ] = TextType::GroundFPS;
+	TextTypes[ "ground_mph" ] = TextType::GroundMPH;
+	TextTypes[ "mach" ] = TextType::Mach;
+	TextTypes[ "g_forces" ] = TextType::GForces;
+	TextTypes[ "heading" ] = TextType::Heading;
+	TextTypes[ "heading_ground" ] = TextType::HeadingGround;
+	TextTypes[ "heading_air" ] = TextType::HeadingAir;
+	TextTypes[ "heading_diff" ] = TextType::HeadingDiff;
+	TextTypes[ "wind_dir" ] = TextType::WindDir;
+	TextTypes[ "wind_knots" ] = TextType::WindKnots;
+	TextTypes[ "wind_fps" ] = TextType::WindFPS;
+	TextTypes[ "wind_mph" ] = TextType::WindMPH;
+	TextTypes[ "tailwind_knots" ] = TextType::TailwindKnots;
+	TextTypes[ "tailwind_fps" ] = TextType::TailwindFPS;
+	TextTypes[ "tailwind_mph" ] = TextType::TailwindMPH;
+	TextTypes[ "crosswind_knots" ] = TextType::CrosswindKnots;
+	TextTypes[ "crosswind_fps" ] = TextType::CrosswindFPS;
+	TextTypes[ "crosswind_mph" ] = TextType::CrosswindMPH;
+	TextTypes[ "wind_heading_effect" ] = TextType::WindHeadingEffect;
+	TextTypes[ "yaw" ] = TextType::Yaw;
+	TextTypes[ "beta" ] = TextType::Beta;
+	TextTypes[ "yaw_trim" ] = TextType::YawTrim;
+	TextTypes[ "climb_angle" ] = TextType::ClimbAngle;
+	TextTypes[ "pitch" ] = TextType::Pitch;
+	TextTypes[ "aoa" ] = TextType::AOA;
+	TextTypes[ "pitch_trim" ] = TextType::PitchTrim;
+	TextTypes[ "roll" ] = TextType::Roll;
+	TextTypes[ "roll_trim" ] = TextType::RollTrim;
+	TextTypes[ "airbrake" ] = TextType::Airbrake;
+	TextTypes[ "gear" ] = TextType::Gear;
+	TextTypes[ "aoai" ] = TextType::AOAI;
 	TextTypes[ "rpm" ] = TextType::RPM;
-	TextTypes[ "fuel" ] = TextType::Fuel;
+	TextTypes[ "nozzle" ] = TextType::Nozzle;
+	TextTypes[ "fuel_total" ] = TextType::FuelTotal;
+	TextTypes[ "fuel_internal" ] = TextType::FuelInternal;
+	TextTypes[ "fuel_external" ] = TextType::FuelExternal;
+	TextTypes[ "fuel_epu" ] = TextType::FuelEPU;
+	TextTypes[ "fuel_flow" ] = TextType::FuelFlow;
+	TextTypes[ "fuel_time" ] = TextType::FuelTime;
+	TextTypes[ "fuel_dist" ] = TextType::FuelDist;
+	TextTypes[ "chaff" ] = TextType::Chaff;
+	TextTypes[ "flares" ] = TextType::Flares;
+	TextTypes[ "caution_master" ] = TextType::CautionMaster;
+	TextTypes[ "rwr_heading" ] = TextType::RWRHeading;
+	TextTypes[ "rwr_lethality" ] = TextType::RWRLethality;
+	TextTypes[ "steerpoint" ] = TextType::Steerpoint;
+	TextTypes[ "horizon_1" ] = TextType::Horizon1;
+	TextTypes[ "horizon_2" ] = TextType::Horizon2;
+	TextTypes[ "horizon_3" ] = TextType::Horizon3;
 	TextTypes[ "ded_line_1" ] = TextType::DEDLine1;
 	TextTypes[ "ded_line_2" ] = TextType::DEDLine2;
 	TextTypes[ "ded_line_3" ] = TextType::DEDLine3;
 	TextTypes[ "ded_line_4" ] = TextType::DEDLine4;
 	TextTypes[ "ded_line_5" ] = TextType::DEDLine5;
+	TextTypes[ "pfl_line_1" ] = TextType::PFLLine1;
+	TextTypes[ "pfl_line_2" ] = TextType::PFLLine2;
+	TextTypes[ "pfl_line_3" ] = TextType::PFLLine3;
+	TextTypes[ "pfl_line_4" ] = TextType::PFLLine4;
+	TextTypes[ "pfl_line_5" ] = TextType::PFLLine5;
+	TextTypes[ "light_bits_1_1" ] = TextType::LightBits1_1;
+	TextTypes[ "light_bits_1_2" ] = TextType::LightBits1_2;
+	TextTypes[ "light_bits_2_1" ] = TextType::LightBits2_1;
+	TextTypes[ "light_bits_2_2" ] = TextType::LightBits2_1;
+	TextTypes[ "light_bits_3_1" ] = TextType::LightBits3_1;
+	TextTypes[ "light_bits_3_2" ] = TextType::LightBits3_2;
+	TextTypes[ "hsi_bits_1" ] = TextType::HsiBits1;
+	TextTypes[ "hsi_bits_2" ] = TextType::HsiBits2;
 	TextTypes[ "run_time" ] = TextType::RunTime;
 
 	ImageTypes[ "attitude" ] = ImageType::Attitude;
 	ImageTypes[ "gear" ] = ImageType::Gear;
+	ImageTypes[ "airbrake" ] = ImageType::Airbrake;
 	ImageTypes[ "ils" ] = ImageType::ILS;
-	ImageTypes[ "simple_rwr" ] = ImageType::SimpleRWR;
+	ImageTypes[ "rwr_simple" ] = ImageType::RWRSimple;
 	ImageTypes[ "throttle" ] = ImageType::Throttle;
 	ImageTypes[ "warning" ] = ImageType::Warning;
 	ImageTypes[ "pitch_trim" ] = ImageType::PitchTrim;
@@ -79,7 +152,7 @@ FalconOutput::FalconOutput( void )
 	Conditions[ "speed_gt450" ] = Condition::SpeedGT450;
 	Conditions[ "speed_gt500" ] = Condition::SpeedGT500;
 	Conditions[ "speed_gt550" ] = Condition::SpeedGT550;
-	Conditions[ "bad_speed" ] = Condition::BadSpeed;
+	Conditions[ "bad_speed" ] = Condition::SpeedBad;
 
 	FalconSilhouette = gcnew cli::array<System::Drawing::PointF>( 15 );
 	FalconSilhouette[  0 ].X =  0.00f;
@@ -274,12 +347,11 @@ bool FalconOutput::CheckCondition( F4SharedMem::FlightData ^fd, int type, double
 			return ( fd->kias > 500.0f );
 		case Condition::SpeedGT550:
 			return ( fd->kias > 550.0f );
-		case Condition::BadSpeed:
+		case Condition::SpeedBad:
 			return ( (fd->kias < 350.0f) || (fd->kias > 450.0f) );
-		
-		default:
-			return false;
 	}
+	
+	return false;
 }
 
 
@@ -295,22 +367,353 @@ void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double tot
 		case TextType::Altitude:
 			swprintf_s( buffer, size, L"MSL: %.0f", fd->z * -1. );
 		break;
-		case TextType::Nozzle:
-			swprintf_s( buffer, size, L"Nozzle: %.0f%%", fd->nozzlePos );
+		case TextType::AltitudeTime:
+			if( fd->zDot > 0.0f )
+				swprintf_s( buffer, size, L"MSL 0: %.0fs", fd->z * -1.0f / fd->zDot );
+			else
+				swprintf_s( buffer, size, L"" );
 		break;
+		
+		case TextType::IndicatedKnots:
+			swprintf_s( buffer, size, L"IAS: %.0f", fd->kias );
+		break;
+		case TextType::IndicatedFPS:
+			swprintf_s( buffer, size, L"IAS: %.0f", fd->kias * 1.68780986 );
+		break;
+		case TextType::IndicatedMPH:
+			swprintf_s( buffer, size, L"IAS: %.0f", fd->kias * 1.15077945 );
+		break;
+		case TextType::TrueKnots:
+			swprintf_s( buffer, size, L"TAS: %.0f", fd->vt * 0.592483801 );
+		break;
+		case TextType::TrueFPS:
+			swprintf_s( buffer, size, L"TAS: %.0f", fd->vt );
+		break;
+		case TextType::TrueMPH:
+			swprintf_s( buffer, size, L"TAS: %.0f", fd->vt * 0.681818182 );
+		break;
+		case TextType::GroundKnots:
+			swprintf_s( buffer, size, L"GS: %.0f", Math2D::Length( fd->xDot, fd->yDot ) * 0.592483801 );
+		break;
+		case TextType::GroundFPS:
+			swprintf_s( buffer, size, L"GS: %.0f", Math2D::Length( fd->xDot, fd->yDot ) );
+		break;
+		case TextType::GroundMPH:
+			swprintf_s( buffer, size, L"GS: %.0f", Math2D::Length( fd->xDot, fd->yDot ) * 0.681818182 );
+		break;
+		
+		case TextType::Mach:
+			swprintf_s( buffer, size, L"Mach: %.0f", fd->mach );
+		break;
+		case TextType::GForces:
+			swprintf_s( buffer, size, L"G-Forces: %.1f", fd->gs );
+		break;
+		
+		case TextType::Heading:
+			swprintf_s( buffer, size, L"Heading: %03i", (int)(fd->currentHeading + 0.5f) );
+		break;
+		case TextType::HeadingGround:
+			swprintf_s( buffer, size, L"Gnd Heading: %03i", (int)(Num::RadToDeg( atan2(fd->yDot,fd->xDot) ) + 360.5f)%360 );
+		break;
+		case TextType::HeadingAir:
+			swprintf_s( buffer, size, L"Dir in Air: %03i", (int)(Num::RadToDeg(DirInAir(fd)) + 360.5f)%360 );
+		break;
+		case TextType::HeadingDiff:
+			swprintf_s( buffer, size, L"Dir Diff: %03i", (int)(Num::RadToDeg( DirInAir(fd) - fd->yaw ) + 360.5f)%360 );
+		break;
+		
+		case TextType::WindDir:
+			swprintf_s( buffer, size, L"WindDir: %03i", (int)(Num::RadToDeg( (float)atan2( fd->yDot - (float)sin(DirInAir(fd)) * fd->vt * (float)cos(fd->gamma), fd->xDot - (float)cos(DirInAir(fd)) * fd->vt * (float)cos(fd->gamma) ) ) + 360.5f)%360 );
+		break;
+		case TextType::WindKnots:
+			swprintf_s( buffer, size, L"WindSpd: %.0f", ( cos( (float)atan2(fd->yDot,fd->xDot) - DirInAir(fd) ) * Math2D::Length( fd->xDot, fd->yDot ) - fd->vt * (float)cos(fd->gamma) ) * 0.592483801 );
+		break;
+		case TextType::WindFPS:
+			swprintf_s( buffer, size, L"WindSpd: %.0f", cos( (float)atan2(fd->yDot,fd->xDot) - DirInAir(fd) ) * Math2D::Length( fd->xDot, fd->yDot ) - fd->vt * (float)cos(fd->gamma) );
+		break;
+		case TextType::WindMPH:
+			swprintf_s( buffer, size, L"WindSpd: %.0f", ( cos( (float)atan2(fd->yDot,fd->xDot) - DirInAir(fd) ) * Math2D::Length( fd->xDot, fd->yDot ) - fd->vt * (float)cos(fd->gamma) ) * 0.681818182 );
+		break;
+		case TextType::TailwindKnots:
+			swprintf_s( buffer, size, L"Twind: %.0f", ( cos( (float)atan2(fd->yDot,fd->xDot) - DirInAir(fd) ) * Math2D::Length( fd->xDot, fd->yDot ) - fd->vt * (float)cos(fd->gamma) ) * 0.592483801 );
+		break;
+		case TextType::TailwindFPS:
+			swprintf_s( buffer, size, L"Twind: %.0f", cos( (float)atan2(fd->yDot,fd->xDot) - DirInAir(fd) ) * Math2D::Length( fd->xDot, fd->yDot ) - fd->vt * (float)cos(fd->gamma) );
+		break;
+		case TextType::TailwindMPH:
+			swprintf_s( buffer, size, L"Twind: %.0f", ( cos( (float)atan2(fd->yDot,fd->xDot) - DirInAir(fd) ) * Math2D::Length( fd->xDot, fd->yDot ) - fd->vt * (float)cos(fd->gamma) ) * 0.681818182 );
+		break;
+		case TextType::CrosswindKnots:
+			swprintf_s( buffer, size, L"Xwind: %.0f", ( sin( (float)atan2(fd->yDot,fd->xDot) - DirInAir(fd) ) * Math2D::Length( fd->xDot, fd->yDot ) ) * 0.592483801 );
+		break;
+		case TextType::CrosswindFPS:
+			swprintf_s( buffer, size, L"Xwind: %.0f", sin( (float)atan2(fd->yDot,fd->xDot) - DirInAir(fd) ) * Math2D::Length( fd->xDot, fd->yDot ) );
+		break;
+		case TextType::CrosswindMPH:
+			swprintf_s( buffer, size, L"Xwind: %.0f", ( sin( (float)atan2(fd->yDot,fd->xDot) - DirInAir(fd) ) * Math2D::Length( fd->xDot, fd->yDot ) ) * 0.681818182 );
+		break;
+		case TextType::WindHeadingEffect:
+			swprintf_s( buffer, size, L"Wind Offset: %03i", (int)(Num::RadToDeg(fd->windOffset)) );
+		break;
+		
+		case TextType::Yaw:
+			swprintf_s( buffer, size, L"Yaw: %03i", (int)(Num::RadToDeg(fd->yaw) + 360.5f)%360 );
+		break;
+		case TextType::Beta:
+			swprintf_s( buffer, size, L"Beta: %.0f", fd->beta );
+		break;
+		case TextType::YawTrim:
+			swprintf_s( buffer, size, L"Yaw Trim: %.0f%%", fd->TrimYaw * 200.0f );
+		break;
+		case TextType::ClimbAngle:
+			swprintf_s( buffer, size, L"Climb Angle: %.0f", Num::RadToDeg(fd->gamma) );
+		break;
+		case TextType::Pitch:
+			swprintf_s( buffer, size, L"Pitch: %.0f", Num::RadToDeg(fd->pitch) );
+		break;
+		case TextType::AOA:
+			swprintf_s( buffer, size, L"AOA: %.0f", fd->alpha );
+		break;
+		case TextType::PitchTrim:
+			swprintf_s( buffer, size, L"Pitch Trim: %.0f%%", fd->TrimPitch * 200.0f );
+		break;
+		case TextType::Roll:
+			swprintf_s( buffer, size, L"Roll: %.0f", Num::RadToDeg(fd->roll) );
+		break;
+		case TextType::RollTrim:
+			swprintf_s( buffer, size, L"Roll Trim: %.0f%%", fd->TrimRoll * 200.0f );
+		break;
+		
+		case TextType::Airbrake:
+			swprintf_s( buffer, size, L"Brake: %.0f%%", fd->speedBrake * 100.0f );
+		break;
+		case TextType::Gear:
+		{
+			const wchar_t *gear = L"Moving...";
+			if( fd->gearPos < 0.01f )
+				gear = L"UP";
+			else if( fd->gearPos > 0.99f )
+				gear = L"DOWN";
+			swprintf_s( buffer, size, L"Gear: %s", gear );
+		}
+		break;
+		case TextType::AOAI:
+		{
+			const wchar_t *aoai = L"";
+			if( fd->lightBits & (int)F4SharedMem::Headers::LightBits::AOAAbove )
+				aoai = L"|/ ABOVE";
+			else if( fd->lightBits & (int)F4SharedMem::Headers::LightBits::AOABelow )
+				aoai = L"/| BELOW";
+			else if( fd->lightBits & (int)F4SharedMem::Headers::LightBits::AOAOn )
+				aoai = L"() ON";
+			swprintf_s( buffer, size, L"AOAI: %s", aoai );
+		}
+		break;
+		
 		case TextType::RPM:
 			swprintf_s( buffer, size, L"RPM: %.0f%%", fd->rpm );
 		break;
-		case TextType::Fuel:
+		case TextType::Nozzle:
+			swprintf_s( buffer, size, L"Nozzle: %.0f%%", (Saitek::MainThread->Config.FalconType == F4SharedMem::FalconDataFormats::AlliedForce) ? fd->nozzlePos : (fd->nozzlePos * 100.) );
+		break;
+		
+		case TextType::FuelTotal:
 			swprintf_s( buffer, size, L"Fuel: %.0f", fd->total );
 		break;
-		case TextType::RunTime:
-			swprintf_s( buffer, size, L"RunTime: %.2f sec", total_time );
+		case TextType::FuelInternal:
+			swprintf_s( buffer, size, L"Fuel Int: %.0f", fd->internalFuel );
 		break;
+		case TextType::FuelExternal:
+			swprintf_s( buffer, size, L"Fuel Ext: %.0f", fd->externalFuel );
+		break;
+		case TextType::FuelEPU:
+			swprintf_s( buffer, size, L"Fuel EPU: %.0f%%", fd->epuFuel );
+		break;
+		case TextType::FuelFlow:
+			swprintf_s( buffer, size, L"Fuel Flow: %.0f", fd->fuelFlow );
+		break;
+		case TextType::FuelTime:
+		{
+			if( fd->fuelFlow > 0.0f )
+				swprintf_s( buffer, size, L"Fuel Time: %.0fm", fd->total / (fd->fuelFlow / 60.0f) );
+		}
+		break;
+		case TextType::FuelDist:
+		{
+			if( fd->fuelFlow > 0.0f )
+				swprintf_s( buffer, size, L"Fuel Dist: %.0fmi", ( Math2D::Length( fd->xDot, fd->yDot ) / 5280.0f ) * fd->total / (fd->fuelFlow / (60.0f*60.0f)) );
+		}
+		break;
+		
+		case TextType::Chaff:
+			swprintf_s( buffer, size, L"Chaff: %.0f", fd->ChaffCount );
+		break;
+		case TextType::Flares:
+			swprintf_s( buffer, size, L"Flare: %.0f", fd->FlareCount );
+		break;
+		
+		case TextType::CautionMaster:
+			swprintf_s( buffer, size, (fd->lightBits & (int)F4SharedMem::Headers::LightBits::MasterCaution) ? L"CAUTION" : L"" );
+		break;
+		
+		case TextType::RWRHeading:
+		{
+			for( int i = 0; i < fd->RwrObjectCount; i ++ )
+			{
+				if( fd->selected[i] )
+					swprintf_s( buffer, size, L"Threat: %03i", ((int)(Num::RadToDeg(fd->bearing[i]) + 360.5f))%360 );
+			}
+		}
+		break;
+		case TextType::RWRLethality:
+		{
+			for( int i = 0; i < fd->RwrObjectCount; i ++ )
+			{
+				if( fd->selected[i] )
+					swprintf_s( buffer, size, L"Lethality: %.2f", fd->lethality[i] );
+			}
+		}
+		break;
+		
+		case TextType::Steerpoint:
+			swprintf_s( buffer, size, L"Steerpoint: %03i", (int)(fd->bearingToBeacon + 0.5f) );
+		break;
+		
+		case TextType::Horizon1:
+		{
+			// FIXME: Don't do this here.
+			
+			// Set up the artificial horizon bitmap.
+			System::Drawing::Bitmap ^horizon = gcnew Bitmap( 16, 3, System::Drawing::Imaging::PixelFormat::Format16bppRgb565 );
+			System::Drawing::Graphics ^horizonGfx = Graphics::FromImage( horizon );
+			System::Drawing::Color horizonEmpty = Color::Red;
+			System::Drawing::Pen ^horizonPen = gcnew Pen( Color::Green );
+			System::Drawing::SolidBrush ^horizonBrush = gcnew SolidBrush( Color::Blue );
+			array<System::Drawing::Point> ^horizonPoints = gcnew array<System::Drawing::Point>(3);
+			double charAspectRatio = 6.0/9.0;
+			
+			// Draw the artificial horizon to a bitmap in memory.
+			double rightX = cos( fd->roll );
+			double rightY = sin( fd->roll );
+			double downX = cos( fd->roll - M_PI/2. );
+			double downY = sin( fd->roll - M_PI/2. );
+			double pitchX = downX * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
+			double pitchY = downY * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
+			horizonPoints[ 0 ].X = (int)( rightX * 100.0 + 7.5 + pitchX );
+			horizonPoints[ 0 ].Y = (int)( rightY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
+			horizonPoints[ 1 ].X = (int)( rightX * -100.0 + 7.5 + pitchX );
+			horizonPoints[ 1 ].Y = (int)( rightY * -100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
+			horizonPoints[ 2 ].X = (int)( downX * 100.0 + 7.5 + pitchX );
+			horizonPoints[ 2 ].Y = (int)( downY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
+			horizonGfx->Clear( horizonEmpty );
+			horizonGfx->FillPolygon( horizonBrush, horizonPoints, System::Drawing::Drawing2D::FillMode::Alternate );
+			horizonGfx->DrawLine( horizonPen, horizonPoints[ 0 ].X, horizonPoints[ 0 ].Y, horizonPoints[ 1 ].X , horizonPoints[ 1 ].Y );
+			
+			wchar_t disp[3]=L"#.";
+			for( int i = 0; i < 16; i ++ )
+			{
+				float hue = horizon->GetPixel(i,2).GetHue();
+				if(fabs( hue - Color::Green.GetHue() ) < 110.0)
+					buffer[i] = disp[0];
+				else if(fabs( hue - Color::Blue.GetHue() ) < 110.0)
+					buffer[i] = disp[1];
+				else buffer[i] = L' ';
+			}
+			swprintf_s( buffer+16, size-16, L"" );
+		}
+		break;
+		case TextType::Horizon2:
+		{
+			// FIXME: Don't do this here.
+			
+			// Set up the artificial horizon bitmap.
+			System::Drawing::Bitmap ^horizon = gcnew Bitmap( 16, 3, System::Drawing::Imaging::PixelFormat::Format16bppRgb565 );
+			System::Drawing::Graphics ^horizonGfx = Graphics::FromImage( horizon );
+			System::Drawing::Color horizonEmpty = Color::Red;
+			System::Drawing::Pen ^horizonPen = gcnew Pen( Color::Green );
+			System::Drawing::SolidBrush ^horizonBrush = gcnew SolidBrush( Color::Blue );
+			array<System::Drawing::Point> ^horizonPoints = gcnew array<System::Drawing::Point>(3);
+			double charAspectRatio = 6.0/9.0;
+			
+			// Draw the artificial horizon to a bitmap in memory.
+			double rightX = cos( fd->roll );
+			double rightY = sin( fd->roll );
+			double downX = cos( fd->roll - M_PI/2. );
+			double downY = sin( fd->roll - M_PI/2. );
+			double pitchX = downX * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
+			double pitchY = downY * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
+			horizonPoints[ 0 ].X = (int)( rightX * 100.0 + 7.5 + pitchX );
+			horizonPoints[ 0 ].Y = (int)( rightY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
+			horizonPoints[ 1 ].X = (int)( rightX * -100.0 + 7.5 + pitchX );
+			horizonPoints[ 1 ].Y = (int)( rightY * -100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
+			horizonPoints[ 2 ].X = (int)( downX * 100.0 + 7.5 + pitchX );
+			horizonPoints[ 2 ].Y = (int)( downY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
+			horizonGfx->Clear( horizonEmpty );
+			horizonGfx->FillPolygon( horizonBrush, horizonPoints, System::Drawing::Drawing2D::FillMode::Alternate );
+			horizonGfx->DrawLine( horizonPen, horizonPoints[ 0 ].X, horizonPoints[ 0 ].Y, horizonPoints[ 1 ].X , horizonPoints[ 1 ].Y );
+			
+			wchar_t disp[3]=L"#.";
+			for( int i = 0; i < 16; i ++ )
+			{
+				float hue = horizon->GetPixel(i,1).GetHue();
+				if(fabs( hue - Color::Green.GetHue() ) < 110.0)
+					buffer[i] = disp[0];
+				else if(fabs( hue - Color::Blue.GetHue() ) < 110.0)
+					buffer[i] = disp[1];
+				else buffer[i] = L' ';
+			}
+			swprintf_s( buffer+16, size-16, L"" );
+		}
+		break;
+		case TextType::Horizon3:
+		{
+			// FIXME: Don't do this here.
+			
+			// Set up the artificial horizon bitmap.
+			System::Drawing::Bitmap ^horizon = gcnew Bitmap( 16, 3, System::Drawing::Imaging::PixelFormat::Format16bppRgb565 );
+			System::Drawing::Graphics ^horizonGfx = Graphics::FromImage( horizon );
+			System::Drawing::Color horizonEmpty = Color::Red;
+			System::Drawing::Pen ^horizonPen = gcnew Pen( Color::Green );
+			System::Drawing::SolidBrush ^horizonBrush = gcnew SolidBrush( Color::Blue );
+			array<System::Drawing::Point> ^horizonPoints = gcnew array<System::Drawing::Point>(3);
+			double charAspectRatio = 6.0/9.0;
+			
+			// Draw the artificial horizon to a bitmap in memory.
+			double rightX = cos( fd->roll );
+			double rightY = sin( fd->roll );
+			double downX = cos( fd->roll - M_PI/2. );
+			double downY = sin( fd->roll - M_PI/2. );
+			double pitchX = downX * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
+			double pitchY = downY * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
+			horizonPoints[ 0 ].X = (int)( rightX * 100.0 + 7.5 + pitchX );
+			horizonPoints[ 0 ].Y = (int)( rightY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
+			horizonPoints[ 1 ].X = (int)( rightX * -100.0 + 7.5 + pitchX );
+			horizonPoints[ 1 ].Y = (int)( rightY * -100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
+			horizonPoints[ 2 ].X = (int)( downX * 100.0 + 7.5 + pitchX );
+			horizonPoints[ 2 ].Y = (int)( downY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
+			horizonGfx->Clear( horizonEmpty );
+			horizonGfx->FillPolygon( horizonBrush, horizonPoints, System::Drawing::Drawing2D::FillMode::Alternate );
+			horizonGfx->DrawLine( horizonPen, horizonPoints[ 0 ].X, horizonPoints[ 0 ].Y, horizonPoints[ 1 ].X , horizonPoints[ 1 ].Y );
+			
+			wchar_t disp[3]=L"#.";
+			for( int i = 0; i < 16; i ++ )
+			{
+				float hue = horizon->GetPixel(i,0).GetHue();
+				if(fabs( hue - Color::Green.GetHue() ) < 110.0)
+					buffer[i] = disp[0];
+				else if(fabs( hue - Color::Blue.GetHue() ) < 110.0)
+					buffer[i] = disp[1];
+				else buffer[i] = L' ';
+			}
+			swprintf_s( buffer+16, size-16, L"" );
+		}
+		break;
+		
 		case TextType::DEDLine1:
 			if( fd->DEDLines && (fd->DEDLines->Length >= 1) )
 			{
-				pin_ptr<const wchar_t> wch = PtrToStringChars( fd->DEDLines[ 0 ] );
+				System::String ^str = System::Text::RegularExpressions::Regex::Replace( fd->DEDLines[ 0 ]->Trim(), "\\s+", " " );
+				pin_ptr<const wchar_t> wch = PtrToStringChars( str );
 				swprintf_s( buffer, size, L"%ls", wch );
 			}
 			else
@@ -319,7 +722,8 @@ void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double tot
 		case TextType::DEDLine2:
 			if( fd->DEDLines && (fd->DEDLines->Length >= 2) )
 			{
-				pin_ptr<const wchar_t> wch = PtrToStringChars( fd->DEDLines[ 1 ] );
+				System::String ^str = System::Text::RegularExpressions::Regex::Replace( fd->DEDLines[ 1 ]->Trim(), "\\s+", " " );
+				pin_ptr<const wchar_t> wch = PtrToStringChars( str );
 				swprintf_s( buffer, size, L"%ls", wch );
 			}
 			else
@@ -328,7 +732,8 @@ void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double tot
 		case TextType::DEDLine3:
 			if( fd->DEDLines && (fd->DEDLines->Length >= 3) )
 			{
-				pin_ptr<const wchar_t> wch = PtrToStringChars( fd->DEDLines[ 2 ] );
+				System::String ^str = System::Text::RegularExpressions::Regex::Replace( fd->DEDLines[ 2 ]->Trim(), "\\s+", " " );
+				pin_ptr<const wchar_t> wch = PtrToStringChars( str );
 				swprintf_s( buffer, size, L"%ls", wch );
 			}
 			else
@@ -337,7 +742,8 @@ void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double tot
 		case TextType::DEDLine4:
 			if( fd->DEDLines && (fd->DEDLines->Length >= 4) )
 			{
-				pin_ptr<const wchar_t> wch = PtrToStringChars( fd->DEDLines[ 3 ] );
+				System::String ^str = System::Text::RegularExpressions::Regex::Replace( fd->DEDLines[ 3 ]->Trim(), "\\s+", " " );
+				pin_ptr<const wchar_t> wch = PtrToStringChars( str );
 				swprintf_s( buffer, size, L"%ls", wch );
 			}
 			else
@@ -346,12 +752,174 @@ void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double tot
 		case TextType::DEDLine5:
 			if( fd->DEDLines && (fd->DEDLines->Length >= 5) )
 			{
-				pin_ptr<const wchar_t> wch = PtrToStringChars( fd->DEDLines[ 4 ] );
+				System::String ^str = System::Text::RegularExpressions::Regex::Replace( fd->DEDLines[ 4 ]->Trim(), "\\s+", " " );
+				pin_ptr<const wchar_t> wch = PtrToStringChars( str );
 				swprintf_s( buffer, size, L"%ls", wch );
 			}
 			else
 				swprintf_s( buffer, size, L"" );
 		break;
+		
+		case TextType::PFLLine1:
+			if( fd->PFLLines && (fd->PFLLines->Length >= 1) )
+			{
+				System::String ^str = System::Text::RegularExpressions::Regex::Replace( fd->PFLLines[ 0 ]->Trim(), "\\s+", " " );
+				pin_ptr<const wchar_t> wch = PtrToStringChars( str );
+				swprintf_s( buffer, size, L"%ls", wch );
+			}
+			else
+				swprintf_s( buffer, size, L"" );
+		break;
+		case TextType::PFLLine2:
+			if( fd->PFLLines && (fd->PFLLines->Length >= 2) )
+			{
+				System::String ^str = System::Text::RegularExpressions::Regex::Replace( fd->PFLLines[ 1 ]->Trim(), "\\s+", " " );
+				pin_ptr<const wchar_t> wch = PtrToStringChars( str );
+				swprintf_s( buffer, size, L"%ls", wch );
+			}
+			else
+				swprintf_s( buffer, size, L"" );
+		break;
+		case TextType::PFLLine3:
+			if( fd->PFLLines && (fd->PFLLines->Length >= 3) )
+			{
+				System::String ^str = System::Text::RegularExpressions::Regex::Replace( fd->PFLLines[ 2 ]->Trim(), "\\s+", " " );
+				pin_ptr<const wchar_t> wch = PtrToStringChars( str );
+				swprintf_s( buffer, size, L"%ls", wch );
+			}
+			else
+				swprintf_s( buffer, size, L"" );
+		break;
+		case TextType::PFLLine4:
+			if( fd->PFLLines && (fd->PFLLines->Length >= 4) )
+			{
+				System::String ^str = System::Text::RegularExpressions::Regex::Replace( fd->PFLLines[ 3 ]->Trim(), "\\s+", " " );
+				pin_ptr<const wchar_t> wch = PtrToStringChars( str );
+				swprintf_s( buffer, size, L"%ls", wch );
+			}
+			else
+				swprintf_s( buffer, size, L"" );
+		break;
+		case TextType::PFLLine5:
+			if( fd->PFLLines && (fd->PFLLines->Length >= 5) )
+			{
+				System::String ^str = System::Text::RegularExpressions::Regex::Replace( fd->PFLLines[ 4 ]->Trim(), "\\s+", " " );
+				pin_ptr<const wchar_t> wch = PtrToStringChars( str );
+				swprintf_s( buffer, size, L"%ls", wch );
+			}
+			else
+				swprintf_s( buffer, size, L"" );
+		break;
+		
+		case TextType::LightBits1_1:
+		{
+			for( int i = 0; i < 16; i ++ )
+			{
+				int test = 1 << i;
+				if( fd->lightBits & test )
+					buffer[ i ] = L'*';
+				else
+					buffer[ i ] = L' ';
+			}
+			swprintf_s( buffer+16, size-16, L"" );
+		}
+		break;
+		case TextType::LightBits1_2:
+		{
+			for( int i = 0; i < 16; i ++ )
+			{
+				int test = 1 << (i + 16);
+				if( fd->lightBits & test )
+					buffer[ i ] = L'*';
+				else
+					buffer[ i ] = L' ';
+			}
+			swprintf_s( buffer+16, size-16, L"" );
+		}
+		break;
+		case TextType::LightBits2_1:
+		{
+			for( int i = 0; i < 16; i ++ )
+			{
+				int test = 1 << i;
+				if( fd->lightBits2 & test )
+					buffer[ i ] = L'*';
+				else
+					buffer[ i ] = L' ';
+			}
+			swprintf_s( buffer+16, size-16, L"" );
+		}
+		break;
+		case TextType::LightBits2_2:
+		{
+			for( int i = 0; i < 16; i ++ )
+			{
+				int test = 1 << (i + 16);
+				if( fd->lightBits2 & test )
+					buffer[ i ] = L'*';
+				else
+					buffer[ i ] = L' ';
+			}
+			swprintf_s( buffer+16, size-16, L"" );
+		}
+		break;
+		case TextType::LightBits3_1:
+		{
+			for( int i = 0; i < 16; i ++ )
+			{
+				int test = 1 << i;
+				if( fd->lightBits3 & test )
+					buffer[ i ] = L'*';
+				else
+					buffer[ i ] = L' ';
+			}
+			swprintf_s( buffer+16, size-16, L"" );
+		}
+		break;
+		case TextType::LightBits3_2:
+		{
+			for( int i = 0; i < 16; i ++ )
+			{
+				int test = 1 << (i + 16);
+				if( fd->lightBits3 & test )
+					buffer[ i ] = L'*';
+				else
+					buffer[ i ] = L' ';
+			}
+			swprintf_s( buffer+16, size-16, L"" );
+		}
+		break;
+		case TextType::HsiBits1:
+		{
+			for( int i = 0; i < 16; i ++ )
+			{
+				int test = 1 << i;
+				if( fd->hsiBits & test )
+					buffer[ i ] = L'*';
+				else
+					buffer[ i ] = L' ';
+			}
+			swprintf_s( buffer+16, size-16, L"" );
+		}
+		break;
+		case TextType::HsiBits2:
+		{
+			for( int i = 0; i < 16; i ++ )
+			{
+				int test = 1 << (i + 16);
+				if( fd->hsiBits & test )
+					buffer[ i ] = L'*';
+				else
+					buffer[ i ] = L' ';
+			}
+			swprintf_s( buffer+16, size-16, L"" );
+		}
+		break;
+		
+		case TextType::RunTime:
+			swprintf_s( buffer, size, L"RunTime: %.2f sec", total_time );
+		break;
+		
 		default:
 			swprintf_s( buffer, size, L"" );
 	}
@@ -438,7 +1006,7 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			}
 			
 			// Restore full-image drawing.
-			gfx->Clip = gcnew Region( Drawing::Rectangle( 0, 0, 320, 240 ) );
+			gfx->Clip = gcnew Region( System::Drawing::Rectangle( 0, 0, 320, 240 ) );
 
 			// Draw inner border.
 			gfx->DrawEllipse( white_pen, x + w/8.f, y + h/8.f, w*3.f/4.f, h*3.f/4.f );
@@ -449,7 +1017,7 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			gfx->DrawLine( orange_pen, x + w/2.f, y + h/8.f, x + w/2.f, y + h/4.f );
 		}
 		break;
-		case ImageType::SimpleRWR:
+		case ImageType::RWRSimple:
 		{
 			// Draw our plane's silhouette.
 			ScalePoints( FalconSilhouette, x + w/4.f, y + h/4.f, w/2.f, h/2.f );
@@ -484,7 +1052,7 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 		{
 			float rpm_h = fd->rpm * h / 200.f;
 			gfx->FillRectangle( green_brush, (float)x, y+h - rpm_h, (float)w, rpm_h );
-			float nozzle_h = fd->nozzlePos * h / 200.f;
+			float nozzle_h = fd->nozzlePos * h / ((Saitek::MainThread->Config.FalconType == F4SharedMem::FalconDataFormats::AlliedForce) ? 200. : 2.);
 			gfx->FillRectangle( red_brush, (float)x, y+h/2 - nozzle_h, (float)w, nozzle_h );
 			gfx->DrawRectangle( grey_pen, x, y, w, h );
 			gfx->DrawLine( grey_pen, x, y+h/2, x+w, y+h/2 );
@@ -531,6 +1099,12 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 
 			gfx->FillEllipse( brush, x, y, w, h );
 			gfx->DrawEllipse( grey_pen, x, y, w, h );
+		}
+		break;
+		case ImageType::Airbrake:
+		{
+			gfx->DrawPie( grey_pen, x-w, y, w*2, h, 270, 180 );
+			gfx->FillPie( red_brush, (float)(x-w), (float)y, (float)(w*2), (float)h, fd->speedBrake * -90.f, fd->speedBrake * 180.f );
 		}
 		break;
 		case ImageType::ScreenCopy:
@@ -633,4 +1207,15 @@ void FalconOutput::UndoScalePoints( cli::array<System::Drawing::PointF> ^points,
 		points[ i ].X /= w;
 		points[ i ].Y /= h;
 	}
+}
+
+
+float FalconOutput::DirInAir( F4SharedMem::FlightData ^fd )
+{
+	// Returns radians.
+	
+	if( (float) cos(fd->gamma) )
+		return fd->yaw + ( Num::DegToRad(fd->beta) * cos(fd->roll) - Num::DegToRad(fd->alpha) * sin(fd->roll) ) / cos(fd->gamma);
+	else
+		return fd->yaw;
 }

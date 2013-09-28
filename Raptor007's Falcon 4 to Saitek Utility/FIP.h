@@ -1,5 +1,4 @@
 #pragma once
-
 class FIPInstance;
 class FIPConfig;
 class FIPPage;
@@ -32,6 +31,7 @@ public:
 	int SelectedPage;
 	
 	FIPInstance( void *saitek_device, FIPConfig *config );
+	virtual ~FIPInstance();
 	
 	const char *TypeString( void );
 	
@@ -50,10 +50,14 @@ public:
 	std::vector<FIPPage*> Pages;
 	
 	FIPConfig( void );
+	virtual ~FIPConfig();
 	
 	const char *TypeString( void );
 	
+	void Clear( void );
+	void LoadLine( std::vector<std::string> cmd_tokens );
 	void SaveLines( FILE *config_file );
+	//void ShowEditWindow( Raptor007sFalcon4toSaitekUtility::MainForm ^main_form );
 };
 
 
@@ -65,6 +69,7 @@ public:
 	LED LED;
 	
 	FIPPage( std::string label );
+	virtual ~FIPPage();
 };
 
 
@@ -76,6 +81,8 @@ public:
 	int X, Y;
 	
 	FIPLayer( void );
+	virtual ~FIPLayer();
+
 	virtual void Draw( F4SharedMem::FlightData ^fd, System::Drawing::Graphics ^gfx, double total_time ) = 0;
 };
 
@@ -86,6 +93,8 @@ public:
 	int W, H;
 
 	FIPImage( int type, int x, int y, int w, int h );
+	virtual ~FIPImage();
+
 	void Draw( F4SharedMem::FlightData ^fd, System::Drawing::Graphics ^gfx, double total_time );
 };
 
@@ -97,5 +106,7 @@ public:
 	msclr::auto_gcroot<System::Drawing::Brush^> TextBrush;
 
 	FIPText( int type, int x, int y, System::Drawing::Font ^font, System::Drawing::Brush ^brush );
+	virtual ~FIPText();
+
 	void Draw( F4SharedMem::FlightData ^fd, System::Drawing::Graphics ^gfx, double total_time );
 };

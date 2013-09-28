@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "PlatformSpecific.h"
+#include <cstddef>
 #include <string>
 #include <vector>
 #include <list>
@@ -21,8 +23,16 @@ namespace CStr
 	
 	int FindInsensitive( const char *str, const char *search_for );
 	
+	class Less
+	{
+	public:
+		bool operator()( const char *a, const char *b ) const;
+	};
+	
 	std::string Escape( const char *str, const char *original, const char *escaped );
 	std::string Unescape( const char *str, const char *original, const char *escaped );
+	
+	void ReplaceChars( char *str, const char *find, const char *replace );
 	
 	std::vector<std::string> SplitToVector( const char *str, const char *delimiters );
 	std::list<std::string> SplitToList( const char *str, const char *delimiters );

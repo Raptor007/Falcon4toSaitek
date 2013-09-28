@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 /* this ALWAYS GENERATED file contains the IIDs and CLSIDs */
 
 /* link this file in with the server and any clients */
