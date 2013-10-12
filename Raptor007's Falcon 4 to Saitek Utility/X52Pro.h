@@ -5,6 +5,8 @@ class X52ProPage;
 
 #include "Device.h"
 #include <vector>
+#include <map>
+#include <string>
 
 
 namespace X52ProLEDNum
@@ -63,6 +65,8 @@ namespace X52ProLEDID
 class X52ProInstance : public DeviceInstance
 {
 public:
+	int SelectedPage;
+	
 	X52ProInstance( void *saitek_device, X52ProConfig *config );
 	virtual ~X52ProInstance();
 	
@@ -70,8 +74,13 @@ public:
 	
 	void Begin( void );
 	void End( void );
-
-	void Update( F4SharedMem::FlightData ^fd, double total_time );
+	
+	void Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, double total_time );
+	
+	void ChangedButton( DWORD button, bool state );
+	
+	void RegisterCallbacks( void );
+	void UnregisterCallbacks( void );
 };
 
 
@@ -79,7 +88,8 @@ class X52ProPage
 {
 public:
 	int Texts[ 3 ];
-
+	std::map<std::string, std::string> KeyBinds;
+	
 	X52ProPage( void );
 	virtual ~X52ProPage();
 };
@@ -90,7 +100,7 @@ class X52ProConfig : public DeviceConfig
 public:
 	std::vector<X52ProPage*> Pages;
 	LED LEDs[ X52ProLEDNum::NUM ];
-
+	
 	X52ProConfig( void );
 	X52ProConfig( std::string config_name );
 	virtual ~X52ProConfig();

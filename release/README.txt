@@ -1,6 +1,6 @@
 =====================================================
 |      Raptor007's Falcon 4 to Saitek Utility       |
-|             Version 2.0 (2013-09-28)              |
+|             Version 2.1 (2013-10-12)              |
 |                                                   |
 |             http://www.raptor007.com/             |
 | http://www.saitekforum.com/showthread.php?t=16028 |
@@ -8,21 +8,29 @@
 =====================================================
 
 
-This program was written by Raptor007 (Blair Sherman).  Email me or find my thread on
-saitekforums.com if you find a bug or would like additional features.  I have plans
-for additional features, so keep watching for updated versions.
+This program was written by Raptor007 (Blair Sherman).  Email me or find my
+thread on saitekforums.com if you find a bug or if you think of something else
+you'd like this utility to do.  I already have some plans for additional
+features, so keep watching for updated versions.
 
-This program would be nothing without the F4SharedMemory library, by Lightning of
-viperpits.org.  Thanks for the excellent work!
+This program would be nothing without the F4SharedMemory library, by Lightning
+of viperpits.org.  Thanks for the excellent work!
 
-Special thanks to Darkcloud of saitekforum.com for pointing me in the right direction.
+Special thanks to Darkcloud of saitekforum.com for pointing me in the right
+direction.
 
 
 INSTALLATION
 ------------
-First you'll need to install the Saitek X52 Pro drivers, FIP drivers, and SST
-programming software (in that order).  These files are available from saitek.com:
-  http://www.saitek.com/uk/down/drivers.php
+First you'll need to install some Saitek drivers that give you DirectOutput 6.6
+or newer.  Saitek currently has some bugs in their 7.0.27.13 X52 Pro drivers,
+so you may want to use the 6.6.1.40 FIP drivers instead (even if you don't have
+a FIP) as they seem to be the best driver release so far.  You CANNOT use the
+old 6.2.2.4 X52 Pro drivers with this utility!
+
+It can be harder than you'd think to get Saitek's drivers working properly.
+See the install instructions on my website if you're having difficulties:
+  http://www.raptor007.com/falcon-4-to-saitek/
 
 You might also need to install the Microsoft Visual C++ 2008 runtime:
   http://www.microsoft.com/downloads/en/details.aspx?FamilyID=9b2da534-3e03-4391-8a4d-074b9f2bc1bf
@@ -30,51 +38,69 @@ You might also need to install the Microsoft Visual C++ 2008 runtime:
 Windows XP users may need to install Microsoft .NET Framework 2.0:
   http://www.microsoft.com/en-us/download/details.aspx?id=1639
 
-Other than that, there's really nothing to do besides unzip the archive, which I
-assume you've already done to read this file.  Now you can place the "Raptor007's
-Falcon 4 to Saitek Utility" folder wherever you'd like it to be.  (I usually place
-it inside the "Lead Pursuit" folder, but this is not required.)
+Other than that, there's really nothing to do besides unzip the archive, which
+I assume you've already done to read this file.  Now you can place the
+"Raptor007's Falcon 4 to Saitek Utility" folder wherever you'd like it to be.
+(I usually place it inside the "Lead Pursuit" folder, but that's not required.)
 
 Keep everything together in that folder!  If F4SharedMem.dll is removed, this
-utility will NOT function.
+utility will NOT function.  It probably won't work without F4TexSharedMem.dll
+either.
+
+
+SETTING UP SHARED TEXTURES
+--------------------------
+To get shared textures from BMS4, you'll need to install Lightning's MFD
+Extractor, available here:
+  https://www.assembla.com/code/lightningstools/subversion/nodes/213/releases/End%20User%20Applications
+
+Once you've got it installed and running, right-click its tray icon and pick
+"Options..." to bring up the options window.  Then select the "Performance"
+tab, click "Falcon BMS Advanced Options...", and check the "Enable exporting
+of 3D cockpit instrument images to shared memory" checkbox.
+
+Unfortunately, the MFD Extractor does not support Allied Force textures.
 
 
 GETTING STARTED
 ---------------
-Default configurations for X52 Pro and FIP are provided, so the easiest way to get
-started is to simply select your flavor of Falcon 4 from the drop-down, click Start,
-and then go play Falcon 4.
+Default configurations for X52 Pro and FIP are provided, so the easiest way to
+get started is to simply select your flavor of Falcon 4 from the drop-down,
+click Start, and then go play Falcon 4.
 
 
 USING AUTO-LAUNCH
 -----------------
-You can use this utility to launch Falcon 4 by checking the "Automatically Start
-Falcon" checkbox.  Click the "Browse..." button to select the Falcon 4 executable
-for the selected flavor of Falcon 4 (such as "FalconAF.exe" for Allied Force).
+You can use this utility to launch Falcon 4 by checking the "Automatically
+Start Falcon" checkbox.  Click the "Browse..." button to select the Falcon 4
+executable for the selected flavor of Falcon 4 (such as "FalconAF.exe" for
+Allied Force).
 
-As of v2.0 of this utility, it will individually remember each Falcon type's path,
-so you can easily switch between Falcon types without having to re-select your exe.
+As of v2.0 of this utility, it will individually remember each Falcon type's
+path, so you can easily switch between Falcon types without having to re-select
+your exe.
 
 
 CUSTOMIZING
 -----------
 You can customize your output configurations by either editing the defaults or
-creating your own from scratch.  Right now these are only editable as text files,
-but I've made all the info somewhat human-readable.  I recommend using the sample
-config files as an example to learn the format.
+creating your own from scratch.  Right now these are only editable as text
+files, but I've made all the info somewhat human-readable.  I recommend using
+the sample config files as an example to learn the format.
 
-If you ever need to restore default configs, simply quit and erase everything in
-the Configs folder.  The next time you launch this utility, it will create new
-default configurations.
+If you ever need to restore default configs, simply quit and erase everything
+in the Configs folder.  The next time you launch this utility, it will create
+new default configurations.
 
 When adding images to the FIP, the first 2 numbers after the image type specify
 the top-left corner (x y).  The last 2 numbers specify the size (w h).
 
 When adding text to the FIP, the 2 numbers specify the top-left corner (x y).
 
-When defining LED states for the X52 Pro buttons or FIP pages, the number at the
-end specifies the blink rate.  0 means solid, 2 means slow blink, 4 means medium
-blink, 8 means fast blink.  You can also experiment with other blink speeds.
+When defining LED states for the X52 Pro buttons or FIP pages, the number at
+the end specifies the blink rate.  0 means solid, 2 means slow blink, 4 means
+medium blink, 8 means fast blink.  You can also experiment with other blink
+speeds.
 
 Names of LEDs:
   fire
@@ -128,6 +154,7 @@ Conditions for LEDs:
   gear_down_aoa_above
   gear_down_aoa_below
   gear_down_aoa_on
+  on_ground
   bad_attitude
   chaff_low
   chaff_empty
@@ -222,6 +249,8 @@ Text for MFD/FIP:
   hsi_bits_1
   hsi_bits_2
   run_time
+  tex_w
+  tex_h
 
 Images for FIP:
   attitude
@@ -239,34 +268,266 @@ Images for FIP:
   screen_center_zoomed
   screen_cursor
   screen_cursor_zoomed
+  tex
+  tex_mfd1
+  tex_mfd2
+  tex_rwr
+  tex_ded
+  tex_hud
+  tex_hmcs
+
+
+BINDING KEYS TO BUTTONS
+-----------------------
+When you make a new config, button presses on the FIP will change output pages,
+and rotating the dials has no effect.  But you can customize these by adding
+"bind" statements in your config files!
+
+The default configurations are set up so the dials will work with BMS4's
+default keyboard layout.  I recommend observing how they look before trying to
+create your own from scratch.
+
+FIP example: Bind the left dial to the A and B keys:
+  bind "left_minus" "a"
+  bind "left_plus" "b"
+
+You can simulate multiple keys pressed in a row using spaces to separate them.
+
+X52 Pro example: Bind the wheel up to type "hello" and down to "world":
+  bind "up" "h e l l o"
+  bind "down" "w o r l d"
+
+NOTE: The list of keys must be enclosed in quotes!
+
+It's also possible to create two different events for button press and release
+using the + and - prefixes before the button name.  You can also use these
+prefixes before key names to simulate holding down these keys.
+
+FIP example: Bind the S6 button to hold ctrl-E for eject:
+  bind "+s6" "+ctrl +e"
+  bind "-s6" "-e -ctrl"
+
+NOTE: If you bind a command to a soft-button on the FIP, that button will no
+longer change pages!  But you can bind page changes on the FIP with the
+at-sign (@) and page number, like so:
+  bind "s6" "@6"
+
+It's also possible to bind events per-page, which overrides the global bind
+while that page is active.
+
+FIP example:
+  screen 1 bind "left_minus" "a"
+  screen 1 bind "left_plus" "b"
+
+X52 Pro example:
+  mfd 1 bind "up" "a"
+  mfd 1 bind "down" "b"
+
+FIP button names:
+  s1
+  s2
+  s3
+  s4
+  s5
+  s6
+  left_minus
+  left_plus
+  right_minus
+  right_plus
+
+X52 Pro button names (right wheel only):
+  up
+  down
+  click
+
+Key scancode names:
+  esc
+  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+  0
+  minus
+  equals
+  backspace
+  tab
+  q
+  w
+  e
+  r
+  t
+  y
+  u
+  i
+  o
+  p
+  left_bracket
+  right_bracket
+  enter
+  ctrl
+  a
+  s
+  d
+  f
+  g
+  h
+  j
+  k
+  l
+  semicolon
+  quote
+  tilde
+  shift
+  backslash
+  z
+  x
+  c
+  v
+  b
+  n
+  m
+  comma
+  period
+  slash
+  right_shift
+  num_star
+  alt
+  left_menu
+  space
+  capslock
+  f1
+  f2
+  f3
+  f4
+  f5
+  f6
+  f7
+  f8
+  f9
+  f10
+  numlock
+  scroll_lock
+  num_7
+  num_8
+  num_9
+  num_minus
+  num_4
+  num_5
+  num_6
+  num_plus
+  num_1
+  num_2
+  num_3
+  num_0
+  num_period
+  oem102
+  f11
+  f12
+  f13
+  f14
+  f15
+  kana
+  abnt_c1
+  convert
+  no_convert
+  yen
+  abnt_c2
+  num_equals
+  track_prev
+  at
+  colon
+  underline
+  kanji
+  stop
+  ax
+  unlabeled
+  track_next
+  num_enter
+  right_ctrl
+  mute
+  calculator
+  play_pause
+  media_stop
+  volume_down
+  volume_up
+  web_home
+  num_comma
+  num_slash
+  print_screen
+  right_alt
+  menu
+  pause
+  home
+  up
+  pgup
+  left
+  right
+  end
+  down
+  pgdn
+  ins
+  del
+  win
+  right_win
+  apps
+  power
+  sleep
+  wake
+  web_search
+  web_favorites
+  web_refresh
+  web_stop
+  web_forward
+  web_back
+  my_computer
+  mail
+  media_select
+
+Or you can use raw numeric scancodes by prefixing the decimal number with a
+pound sign (#) like so:
+  bind "s1" "#30"
+
+The raw values for these keys come from Microsoft's DirectInput documentation,
+but many of them do not behave as I'd expect.  Your mileage may vary.
 
 
 TROUBLESHOOTING
 ---------------
-If you get no lights or MFD activity after clicking Start and opening Falcon 4, you
-probably need to restart the Saitek DirectOutput service.  To do this, quit Falcon 4
-and click the "Restart DirectOutput" button at the bottom of the settings window.  It
-should work properly the next time you start it.
+If your device list is missing items, you probably have the wrong drivers
+installed.  This utility requires DirectOutput 6.6 or later, which is included
+with the FIP SD6 drivers (this should work for the X52 Pro too).  Scroll up to
+the "INSTALLATION" section of this readme for more information.
 
-If you get an error about DirectOutput not found or the list of devices is empty, you
-may need to reinstall the Saitek drivers.  This version of my utility is designed to
-work with Saitek DirectOutput 6.6, so you will probably need to install FIP drivers
-even if you only have an X52 Pro.
+If you're sure you've properly installed DirectOutput 6.6+ and your device
+still isn't showing up, try moving it to a different USB port.
 
-If Falcon 4 freezes when you launch it, hit Stop, check the "Wait for Falcon" box,
-then hit Start and try again.
+If you get no lights or MFD activity after clicking Start and opening Falcon 4,
+you may need to restart the Saitek DirectOutput service.  To do this, click the
+"Restart DirectOutput" button at the bottom of the settings window.  It should
+work properly the next time you click Start.
+
+If Falcon 4 freezes when you launch it, hit Stop, check the "Wait for Falcon"
+box, then hit Start and try again.
 
 
-PLANNED IMPROVEMENTS
---------------------
-* Use F4TexSharedMem to copy textures directly to the FIP from BMS4.
-* New FIP images:
- - Full-featured RWR.
- - Damage report.
- - Map with bullseye, if possible.
-* Nice GUI mode for editing configs.
-* Ability to read v1.x config files for X52 Pro.
-
+CHANGES: v2.1 (2013-10-12)
+--------------------------
+* Added the ability to read shared textures using Lightning's F4TexSharedMem.
+* Updated default FIP config to utilize some shared textures when available.
+* Can now bind device button presses to simulated keyboard presses.
+* Added new default configs for FIP MFD emulation (with MFD Extractor).
+* Added keybinds for BMS4 to all default configs.
+* Remembers your device's selected configs.
+* Added on_ground condition for LEDs.
+* Tweaked text display of fuel time remaining.
+* Implemented ctrl-A shortcut in config editor for select-all.
+* Vastly improved memory management.
+* Fixed a potential crash when applying config changes while it's running.
 
 CHANGES: v2.0 (2013-09-28)
 --------------------------

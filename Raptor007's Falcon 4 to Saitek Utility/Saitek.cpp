@@ -11,6 +11,8 @@
 
 namespace Saitek
 {
+	float Version = 2.1f;
+	
 	FalconOutput Output;
 	
 	CDirectOutput DO;
@@ -24,6 +26,162 @@ namespace Saitek
 	bool ConfigsChanged;
 	
 	msclr::auto_gcroot<FalconThread^> MainThread = gcnew FalconThread();
+	
+	std::map<std::string,WORD> KeyMap;
+}
+
+
+void Saitek::InitKeyMap( void )
+{
+	if( ! KeyMap.size() )
+	{
+		KeyMap[ "esc" ] = 1;
+		KeyMap[ "1" ] = 2;
+		KeyMap[ "2" ] = 3;
+		KeyMap[ "3" ] = 4;
+		KeyMap[ "4" ] = 5;
+		KeyMap[ "5" ] = 6;
+		KeyMap[ "6" ] = 7;
+		KeyMap[ "7" ] = 8;
+		KeyMap[ "8" ] = 9;
+		KeyMap[ "9" ] = 10;
+		KeyMap[ "0" ] = 11;
+		KeyMap[ "minus" ] = 12;
+		KeyMap[ "equals" ] = 13;
+		KeyMap[ "backspace" ] = 14;
+		KeyMap[ "tab" ] = 15;
+		KeyMap[ "q" ] = 16;
+		KeyMap[ "w" ] = 17;
+		KeyMap[ "e" ] = 18;
+		KeyMap[ "r" ] = 19;
+		KeyMap[ "t" ] = 20;
+		KeyMap[ "y" ] = 21;
+		KeyMap[ "u" ] = 22;
+		KeyMap[ "i" ] = 23;
+		KeyMap[ "o" ] = 24;
+		KeyMap[ "p" ] = 25;
+		KeyMap[ "left_bracket" ] = 26;
+		KeyMap[ "right_bracket" ] = 27;
+		KeyMap[ "enter" ] = 28;
+		KeyMap[ "ctrl" ] = 29;
+		KeyMap[ "a" ] = 30;
+		KeyMap[ "s" ] = 31;
+		KeyMap[ "d" ] = 32;
+		KeyMap[ "f" ] = 33;
+		KeyMap[ "g" ] = 34;
+		KeyMap[ "h" ] = 35;
+		KeyMap[ "j" ] = 36;
+		KeyMap[ "k" ] = 37;
+		KeyMap[ "l" ] = 38;
+		KeyMap[ "semicolon" ] = 39;
+		KeyMap[ "quote" ] = 40;
+		KeyMap[ "tilde" ] = 41;
+		KeyMap[ "shift" ] = 42;
+		KeyMap[ "backslash" ] = 43;
+		KeyMap[ "z" ] = 44;
+		KeyMap[ "x" ] = 45;
+		KeyMap[ "c" ] = 46;
+		KeyMap[ "v" ] = 47;
+		KeyMap[ "b" ] = 48;
+		KeyMap[ "n" ] = 49;
+		KeyMap[ "m" ] = 50;
+		KeyMap[ "comma" ] = 51;
+		KeyMap[ "period" ] = 52;
+		KeyMap[ "slash" ] = 53;
+		KeyMap[ "right_shift" ] = 54;
+		KeyMap[ "num_star" ] = 55;
+		KeyMap[ "alt" ] = 56;
+		KeyMap[ "left_menu" ] = 56;
+		KeyMap[ "space" ] = 57;
+		KeyMap[ "capslock" ] = 58;
+		KeyMap[ "f1" ] = 59;
+		KeyMap[ "f2" ] = 60;
+		KeyMap[ "f3" ] = 61;
+		KeyMap[ "f4" ] = 62;
+		KeyMap[ "f5" ] = 63;
+		KeyMap[ "f6" ] = 64;
+		KeyMap[ "f7" ] = 65;
+		KeyMap[ "f8" ] = 66;
+		KeyMap[ "f9" ] = 67;
+		KeyMap[ "f10" ] = 68;
+		KeyMap[ "numlock" ] = 69;
+		KeyMap[ "scroll_lock" ] = 70;
+		KeyMap[ "num_7" ] = 71;
+		KeyMap[ "num_8" ] = 72;
+		KeyMap[ "num_9" ] = 73;
+		KeyMap[ "num_minus" ] = 74;
+		KeyMap[ "num_4" ] = 75;
+		KeyMap[ "num_5" ] = 76;
+		KeyMap[ "num_6" ] = 77;
+		KeyMap[ "num_plus" ] = 78;
+		KeyMap[ "num_1" ] = 79;
+		KeyMap[ "num_2" ] = 80;
+		KeyMap[ "num_3" ] = 81;
+		KeyMap[ "num_0" ] = 82;
+		KeyMap[ "num_period" ] = 83;
+		KeyMap[ "oem102" ] = 86;
+		KeyMap[ "f11" ] = 87;
+		KeyMap[ "f12" ] = 88;
+		KeyMap[ "f13" ] = 100;
+		KeyMap[ "f14" ] = 101;
+		KeyMap[ "f15" ] = 102;
+		KeyMap[ "kana" ] = 112;
+		KeyMap[ "abnt_c1" ] = 115;
+		KeyMap[ "convert" ] = 121;
+		KeyMap[ "no_convert" ] = 123;
+		KeyMap[ "yen" ] = 125;
+		KeyMap[ "abnt_c2" ] = 126;
+		KeyMap[ "num_equals" ] = 141;
+		KeyMap[ "track_prev" ] = 144;
+		KeyMap[ "at" ] = 145;
+		KeyMap[ "colon" ] = 146;
+		KeyMap[ "underline" ] = 147;
+		KeyMap[ "kanji" ] = 148;
+		KeyMap[ "stop" ] = 149;
+		KeyMap[ "ax" ] = 150;
+		KeyMap[ "unlabeled" ] = 151;
+		KeyMap[ "track_next" ] = 153;
+		KeyMap[ "num_enter" ] = 156;
+		KeyMap[ "right_ctrl" ] = 157;
+		KeyMap[ "mute" ] = 160;
+		KeyMap[ "calculator" ] = 161;
+		KeyMap[ "play_pause" ] = 162;
+		KeyMap[ "media_stop" ] = 164;
+		KeyMap[ "volume_down" ] = 174;
+		KeyMap[ "volume_up" ] = 176;
+		KeyMap[ "web_home" ] = 178;
+		KeyMap[ "num_comma" ] = 179;
+		KeyMap[ "num_slash" ] = 181;
+		KeyMap[ "print_screen" ] = 183;
+		KeyMap[ "right_alt" ] = 184;
+		KeyMap[ "menu" ] = 184;
+		KeyMap[ "pause" ] = 197;
+		KeyMap[ "home" ] = 199;
+		KeyMap[ "up" ] = 200;
+		KeyMap[ "pgup" ] = 201;
+		KeyMap[ "left" ] = 203;
+		KeyMap[ "right" ] = 205;
+		KeyMap[ "end" ] = 207;
+		KeyMap[ "down" ] = 208;
+		KeyMap[ "pgdn" ] = 209;
+		KeyMap[ "ins" ] = 210;
+		KeyMap[ "del" ] = 211;
+		KeyMap[ "win" ] = 219;
+		KeyMap[ "right_win" ] = 220;
+		KeyMap[ "apps" ] = 221;
+		KeyMap[ "power" ] = 222;
+		KeyMap[ "sleep" ] = 223;
+		KeyMap[ "wake" ] = 227;
+		KeyMap[ "web_search" ] = 229;
+		KeyMap[ "web_favorites" ] = 230;
+		KeyMap[ "web_refresh" ] = 231;
+		KeyMap[ "web_stop" ] = 232;
+		KeyMap[ "web_forward" ] = 233;
+		KeyMap[ "web_back" ] = 234;
+		KeyMap[ "my_computer" ] = 235;
+		KeyMap[ "mail" ] = 236;
+		KeyMap[ "media_select" ] = 237;
+	}
 }
 
 
@@ -34,16 +192,23 @@ void Saitek::GenerateDefaults( void )
 		config->Name = "Falcon 4 Joystick";
 		Saitek::Configs[ config->Name ] = config;
 		
+		config->KeyBinds[ "up" ] = "+alt p -alt";
+		config->KeyBinds[ "down" ] = "+shift slash -shift";
+		config->KeyBinds[ "+click" ] = "+k";
+		config->KeyBinds[ "-click" ] = "-k";
+		
 		config->LEDs[ X52ProLEDNum::Fire ].Conditions.push_back( new LEDCondition( Condition::CautionStoresConfig, LEDColor::On, 2 ) );
 		config->LEDs[ X52ProLEDNum::A ].Conditions.push_back( new LEDCondition( Condition::CautionAltitude, LEDColor::Yellow, 8 ) );
 		config->LEDs[ X52ProLEDNum::A ].Conditions.push_back( new LEDCondition( Condition::RWRMissile, LEDColor::Red, 8 ) );
 		config->LEDs[ X52ProLEDNum::A ].Conditions.push_back( new LEDCondition( Condition::RWRLock, LEDColor::Red, 0 ) );
+		config->LEDs[ X52ProLEDNum::A ].Conditions.push_back( new LEDCondition( Condition::OnGround, LEDColor::Green, 0 ) );
 		config->LEDs[ X52ProLEDNum::A ].Conditions.push_back( new LEDCondition( Condition::GearDownAOAAbove, LEDColor::Yellow, 0 ) );
 		config->LEDs[ X52ProLEDNum::A ].Conditions.push_back( new LEDCondition( Condition::GearDownAOABelow, LEDColor::Off, 0 ) );
 		config->LEDs[ X52ProLEDNum::A ].Conditions.push_back( new LEDCondition( Condition::BadAttitude, LEDColor::Yellow, 2 ) );
 		config->LEDs[ X52ProLEDNum::B ].Conditions.push_back( new LEDCondition( Condition::CautionAltitude, LEDColor::Yellow, 8 ) );
 		config->LEDs[ X52ProLEDNum::B ].Conditions.push_back( new LEDCondition( Condition::RWRMissile, LEDColor::Red, 8 ) );
 		config->LEDs[ X52ProLEDNum::B ].Conditions.push_back( new LEDCondition( Condition::RWRLock, LEDColor::Red, 0 ) );
+		config->LEDs[ X52ProLEDNum::B ].Conditions.push_back( new LEDCondition( Condition::OnGround, LEDColor::Green, 0 ) );
 		config->LEDs[ X52ProLEDNum::B ].Conditions.push_back( new LEDCondition( Condition::GearDownAOABelow, LEDColor::Yellow, 0 ) );
 		config->LEDs[ X52ProLEDNum::B ].Conditions.push_back( new LEDCondition( Condition::GearDownAOAAbove, LEDColor::Off, 0 ) );
 		config->LEDs[ X52ProLEDNum::B ].Conditions.push_back( new LEDCondition( Condition::BadAttitude, LEDColor::Yellow, 2 ) );
@@ -68,6 +233,7 @@ void Saitek::GenerateDefaults( void )
 		config->LEDs[ X52ProLEDNum::T1 ].Conditions.push_back( new LEDCondition( Condition::AirBrake, LEDColor::Green, 2 ) );
 		config->LEDs[ X52ProLEDNum::T1 ].Conditions.push_back( new LEDCondition( Condition::CautionMaster, LEDColor::Yellow, 0 ) );
 		config->LEDs[ X52ProLEDNum::T3 ].Conditions.push_back( new LEDCondition( Condition::CautionOil, LEDColor::Red, 8 ) );
+		config->LEDs[ X52ProLEDNum::T3 ].Conditions.push_back( new LEDCondition( Condition::OnGround, LEDColor::Green, 0 ) );
 		config->LEDs[ X52ProLEDNum::T3 ].Conditions.push_back( new LEDCondition( Condition::GearDown, LEDColor::Green, 2 ) );
 		config->LEDs[ X52ProLEDNum::T3 ].Conditions.push_back( new LEDCondition( Condition::GearMoving, LEDColor::Green, 8 ) );
 		config->LEDs[ X52ProLEDNum::T3 ].Conditions.push_back( new LEDCondition( Condition::CautionMaster, LEDColor::Yellow, 0 ) );
@@ -125,6 +291,11 @@ void Saitek::GenerateDefaults( void )
 		config->Name = "Falcon 4 FIP";
 		Saitek::Configs[ config->Name ] = config;
 		
+		config->KeyBinds[ "left_minus" ] = "+shift z -shift";
+		config->KeyBinds[ "left_plus" ] = "+shift x -shift";
+		config->KeyBinds[ "right_minus" ] = "+ctrl m -ctrl";
+		config->KeyBinds[ "right_plus" ] = "+shift m -shift";
+		
 		FIPPage *status_page = new FIPPage( "Multi" );
 		config->Pages.push_back( status_page );
 		status_page->Layers.push_back( new FIPImage( ImageType::Attitude, 70, 10, 130, 130 ) );
@@ -151,6 +322,7 @@ void Saitek::GenerateDefaults( void )
 		FIPPage *rwr_page = new FIPPage( "RWR" );
 		config->Pages.push_back( rwr_page );
 		rwr_page->Layers.push_back( new FIPImage( ImageType::RWRSimple, 80, 10, 220, 220 ) );
+		rwr_page->Layers.push_back( new FIPImage( ImageType::TexRWR, 79, 9, 222, 222 ) );
 		rwr_page->Layers.push_back( new FIPImage( ImageType::Attitude, 270, 190, 47, 47 ) );
 		rwr_page->LED.Conditions.push_back( new LEDCondition( Condition::RWRMissile, LEDColor::On, 8 ) );
 		rwr_page->LED.Conditions.push_back( new LEDCondition( Condition::RWRLock, LEDColor::On, 2 ) );
@@ -163,12 +335,63 @@ void Saitek::GenerateDefaults( void )
 		ils_page->Layers.push_back( new FIPImage( ImageType::Gear, 270, 35, 15, 15 ) );
 		ils_page->Layers.push_back( new FIPImage( ImageType::Gear, 302, 35, 15, 15 ) );
 		ils_page->Layers.push_back( new FIPImage( ImageType::Airbrake, 70, 190, 25, 47 ) );
+		ils_page->LED.Conditions.push_back( new LEDCondition( Condition::OnGround, LEDColor::On, 0 ) );
 		ils_page->LED.Conditions.push_back( new LEDCondition( Condition::GearMoving, LEDColor::On, 8 ) );
 		ils_page->LED.Conditions.push_back( new LEDCondition( Condition::GearDownAOAAbove, LEDColor::On, 4 ) );
 		ils_page->LED.Conditions.push_back( new LEDCondition( Condition::GearDownAOABelow, LEDColor::On, 4 ) );
 		ils_page->LED.Conditions.push_back( new LEDCondition( Condition::GearDown, LEDColor::On, 2 ) );
+		
+		FIPPage *mfd1_page = new FIPPage( "MFD1" );
+		config->Pages.push_back( mfd1_page );
+		mfd1_page->Layers.push_back( new FIPImage( ImageType::TexMFD1, 80, 0, 240, 240 ) );
+		
+		FIPPage *mfd2_page = new FIPPage( "MFD2" );
+		config->Pages.push_back( mfd2_page );
+		mfd2_page->Layers.push_back( new FIPImage( ImageType::TexMFD2, 80, 0, 240, 240 ) );
 	}
-
+	
+	{
+		FIPConfig *config = new FIPConfig();
+		config->Name = "MFD Extractor Left";
+		Saitek::Configs[ config->Name ] = config;
+		
+		FIPPage *mfd_page = new FIPPage( "" );
+		config->Pages.push_back( mfd_page );
+		mfd_page->LED.DefaultLook.Color = LEDColor::Off;
+		mfd_page->Layers.push_back( new FIPImage( ImageType::TexMFD1, 20, 0, 240, 240 ) );
+		mfd_page->KeyBinds[ "s1" ] = "+ctrl +alt num_0 -alt -ctrl";
+		mfd_page->KeyBinds[ "s2" ] = "+ctrl +alt num_9 -alt -ctrl";
+		mfd_page->KeyBinds[ "s3" ] = "+ctrl +alt num_8 -alt -ctrl";
+		mfd_page->KeyBinds[ "s4" ] = "+ctrl +alt num_7 -alt -ctrl";
+		mfd_page->KeyBinds[ "s5" ] = "+ctrl +alt num_6 -alt -ctrl";
+		mfd_page->KeyBinds[ "s6" ] = "+ctrl +alt num_5 -alt -ctrl";
+		mfd_page->KeyBinds[ "left_minus" ] = "+ctrl +alt num_4 -alt -ctrl";
+		mfd_page->KeyBinds[ "left_plus" ] = "+ctrl +alt num_3 -alt -ctrl";
+		mfd_page->KeyBinds[ "right_minus" ] = "+ctrl +alt num_2 -alt -ctrl";
+		mfd_page->KeyBinds[ "right_plus" ] = "+ctrl +alt num_1 -alt -ctrl";
+	}
+	
+	{
+		FIPConfig *config = new FIPConfig();
+		config->Name = "MFD Extractor Right";
+		Saitek::Configs[ config->Name ] = config;
+		
+		FIPPage *mfd_page = new FIPPage( "" );
+		config->Pages.push_back( mfd_page );
+		mfd_page->LED.DefaultLook.Color = LEDColor::Off;
+		mfd_page->Layers.push_back( new FIPImage( ImageType::TexMFD2, 20, 0, 240, 240 ) );
+		mfd_page->KeyBinds[ "s1" ] = "+shift +alt num_0 -alt -shift";
+		mfd_page->KeyBinds[ "s2" ] = "+shift +alt num_9 -alt -shift";
+		mfd_page->KeyBinds[ "s3" ] = "+shift +alt num_8 -alt -shift";
+		mfd_page->KeyBinds[ "s4" ] = "+shift +alt num_7 -alt -shift";
+		mfd_page->KeyBinds[ "s5" ] = "+shift +alt num_6 -alt -shift";
+		mfd_page->KeyBinds[ "s6" ] = "+shift +alt num_5 -alt -shift";
+		mfd_page->KeyBinds[ "left_minus" ] = "+shift +alt num_4 -alt -shift";
+		mfd_page->KeyBinds[ "left_plus" ] = "+shift +alt num_3 -alt -shift";
+		mfd_page->KeyBinds[ "right_minus" ] = "+shift +alt num_2 -alt -shift";
+		mfd_page->KeyBinds[ "right_plus" ] = "+shift +alt num_1 -alt -shift";
+	}
+	
 	{
 		FIPConfig *config = new FIPConfig();
 		config->Name = "Screen FIP";
@@ -193,6 +416,12 @@ void Saitek::GenerateDefaults( void )
 		FIPPage *cursor2_page = new FIPPage( "" );
 		config->Pages.push_back( cursor2_page );
 		cursor2_page->Layers.push_back( new FIPImage( ImageType::ScreenCursorZoomed, 0, 0, 320, 240 ) );
+		
+		FIPPage *tex_page = new FIPPage( "" );
+		config->Pages.push_back( tex_page );
+		tex_page->Layers.push_back( new FIPImage( ImageType::Tex, 0, 0, 320, 240 ) );
+		tex_page->LED.DefaultLook.Color = LEDColor::Off;
+		tex_page->LED.Conditions.push_back( new LEDCondition( Condition::RWRContact, LEDColor::On, 0 ) );
 	}
 }
 
@@ -313,9 +542,13 @@ void Saitek::Deinitialize( void )
 {
 	if( Initialized )
 	{
-		// FIXME: Memory cleanup!
+		for( std::vector<DeviceInstance*>::iterator inst_iter = Instances.begin(); inst_iter != Instances.end(); inst_iter ++ )
+		{
+			delete *inst_iter;
+			*inst_iter = NULL;
+		}
 		Instances.clear();
-
+		
 		DO.Deinitialize();
 		Initialized = false;
 	}
@@ -384,26 +617,15 @@ void __stdcall Saitek::DeviceChange( void *device, bool added, void *ctxt )
 
 void __stdcall Saitek::PageChange( void *device, DWORD page_num, bool active, void *instance_ptr )
 {
+	DeviceInstance *instance = (DeviceInstance*) instance_ptr;
+	if( active && (instance->Guid == DeviceType_X52Pro) )
+		((X52ProInstance*)instance)->SelectedPage = page_num;
 }
 
 void __stdcall Saitek::SoftButtonChange( void *device, DWORD buttons, void *instance_ptr )
 {
 	DeviceInstance *instance = (DeviceInstance*) instance_ptr;
-	if( instance->Guid == DeviceType_Fip )
-	{
-		if( buttons & SoftButton_1 )
-			((FIPInstance*)( instance ))->SetPage( 0 );
-		else if( buttons & SoftButton_2 )
-			((FIPInstance*)( instance ))->SetPage( 1 );
-		else if( buttons & SoftButton_3 )
-			((FIPInstance*)( instance ))->SetPage( 2 );
-		else if( buttons & SoftButton_4 )
-			((FIPInstance*)( instance ))->SetPage( 3 );
-		else if( buttons & SoftButton_5 )
-			((FIPInstance*)( instance ))->SetPage( 4 );
-		else if( buttons & SoftButton_6 )
-			((FIPInstance*)( instance ))->SetPage( 5 );
-	}
+	instance->ChangeButtons( buttons );
 }
 
 

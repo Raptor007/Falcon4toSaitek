@@ -8,6 +8,7 @@ class LED;
 
 #include <string>
 #include <vector>
+#include <map>
 #include "DirectOutputImpl.h"
 
 namespace Raptor007sFalcon4toSaitekUtility
@@ -34,6 +35,7 @@ class DeviceConfig : public Device
 public:
 	std::string Name;
 	int SleepMs;
+	std::map<std::string,std::string> KeyBinds;
 	
 	DeviceConfig( GUID guid );
 	virtual ~DeviceConfig();
@@ -54,17 +56,21 @@ class DeviceInstance : public Device
 public:
 	void *SaitekDevice;
 	DeviceConfig *Config;
-
+	DWORD Buttons;
+	
 	DeviceInstance( void *saitek_device, DeviceConfig *config, GUID guid );
 	virtual ~DeviceInstance();
-
+	
 	virtual void Begin( void );
 	virtual void End( void );
-
-	virtual void Update( F4SharedMem::FlightData ^fd, double dt );
-
-	void RegisterCallbacks( void );
-	void UnregisterCallbacks( void );
+	
+	virtual void Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, double dt );
+	
+	void ChangeButtons( DWORD buttons );
+	virtual void ChangedButton( DWORD button, bool state );
+	
+	virtual void RegisterCallbacks( void );
+	virtual void UnregisterCallbacks( void );
 };
 
 

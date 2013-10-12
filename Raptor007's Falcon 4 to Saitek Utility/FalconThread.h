@@ -13,7 +13,9 @@ public:
 	
 	bool FalconRunning;
 	F4SharedMem::FlightData ^FD;
+	System::Drawing::Bitmap ^Tex;
 	System::Threading::ReaderWriterLock FDLock;
+	bool DoDeviceUpdates;
 	
 	FalconThread( void );
 	void Code( void );

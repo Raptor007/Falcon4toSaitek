@@ -61,11 +61,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(NoInherit)"
+				AdditionalDependencies="$(NoInherit) user32.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
 				SubSystem="2"
+				LargeAddressAware="2"
 				EntryPointSymbol="main"
 				TargetMachine="1"
 			/>
@@ -138,86 +139,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(NoInherit)"
+				AdditionalDependencies="$(NoInherit) user32.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				EntryPointSymbol="main"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Form Designer|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			UseOfATL="1"
-			CharacterSet="1"
-			ManagedExtensions="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;FORM_DESIGNER&quot;"
-				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;FORM_DESIGNER"
-				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-				DisableSpecificWarnings="4800;4244;4996"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="$(NoInherit)"
-				LinkIncremental="2"
-				GenerateDebugInformation="true"
-				AssemblyDebug="1"
-				SubSystem="2"
+				LargeAddressAware="2"
 				EntryPointSymbol="main"
 				TargetMachine="1"
 			/>
@@ -271,8 +197,13 @@
 			MinFrameworkVersion="131072"
 		/>
 		<AssemblyReference
-			RelativePath="..\debug\F4SharedMem.dll"
+			RelativePath="..\release\F4SharedMem.dll"
 			AssemblyName="F4SharedMem, Version=2.3.2.0, PublicKeyToken=98c24c6603c8861c, processorArchitecture=IA64"
+			MinFrameworkVersion="131072"
+		/>
+		<AssemblyReference
+			RelativePath="..\release\F4TexSharedMem.dll"
+			AssemblyName="F4TexSharedMem, Version=1.4.0.0, PublicKeyToken=13cc4724751b44e4, processorArchitecture=IA64"
 			MinFrameworkVersion="131072"
 		/>
 	</References>
@@ -320,6 +251,14 @@
 			</File>
 			<File
 				RelativePath=".\DirectOutputImpl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DrawingToolbox.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DrawingToolbox.h"
 				>
 			</File>
 			<File

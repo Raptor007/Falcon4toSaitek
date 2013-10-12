@@ -27,6 +27,8 @@ void DeviceThread::Code( void )
 				if( MasterThread->FDLock.IsReaderLockHeld )
 				{
 					FD = MasterThread->FD;
+					Tex = MasterThread->Tex;
+					
 					MasterThread->FDLock.ReleaseLock();
 				}
 			}
@@ -35,7 +37,8 @@ void DeviceThread::Code( void )
 
 		if( MasterThread->FalconRunning || (! MasterThread->Config.WaitForFalcon) )
 		{
-			Instance->Update( MasterThread->FD, run_timer.ElapsedSeconds() );
+			if( MasterThread->DoDeviceUpdates )
+				Instance->Update( MasterThread->FD, MasterThread->Tex, run_timer.ElapsedSeconds() );
 			System::Threading::Thread::Sleep( SleepMs );
 		}
 		else

@@ -16,6 +16,51 @@ using namespace System::Drawing;
 
 FalconOutput::FalconOutput( void )
 {
+	Conditions[ "rwr_missile" ] = Condition::RWRMissile;
+	Conditions[ "rwr_lock" ] = Condition::RWRLock;
+	Conditions[ "rwr_lethal" ] = Condition::RWRLethal;
+	Conditions[ "rwr_contact" ] = Condition::RWRContact;
+	Conditions[ "caution_master" ] = Condition::CautionMaster;
+	Conditions[ "caution_altitude" ] = Condition::CautionAltitude;
+	Conditions[ "caution_stores_config" ] = Condition::CautionStoresConfig;
+	Conditions[ "caution_ecm" ] = Condition::CautionECM;
+	Conditions[ "caution_fuel" ] = Condition::CautionFuel;
+	Conditions[ "caution_oil" ] = Condition::CautionOil;
+	Conditions[ "caution_engine_fault" ] = Condition::CautionEngineFault;
+	Conditions[ "caution_avionics" ] = Condition::CautionAvionics;
+	Conditions[ "caution_flcs" ] = Condition::CautionFLCS;
+	Conditions[ "ecm" ] = Condition::ECM;
+	Conditions[ "afterburner" ] = Condition::Afterburner;
+	Conditions[ "airbrake" ] = Condition::AirBrake;
+	Conditions[ "airbrake_33" ] = Condition::AirBrake33;
+	Conditions[ "airbrake_66" ] = Condition::AirBrake66;
+	Conditions[ "airbrake_99" ] = Condition::AirBrake99;
+	Conditions[ "gear_down" ] = Condition::GearDown;
+	Conditions[ "gear_up" ] = Condition::GearUp;
+	Conditions[ "gear_moving" ] = Condition::GearMoving;
+	Conditions[ "aoa_above" ] = Condition::AOAAbove;
+	Conditions[ "aoa_below" ] = Condition::AOABelow;
+	Conditions[ "aoa_on" ] = Condition::AOAOn;
+	Conditions[ "gear_down_aoa_above" ] = Condition::GearDownAOAAbove;
+	Conditions[ "gear_down_aoa_below" ] = Condition::GearDownAOABelow;
+	Conditions[ "gear_down_aoa_on" ] = Condition::GearDownAOAOn;
+	Conditions[ "on_ground" ] = Condition::OnGround;
+	Conditions[ "bad_attitude" ] = Condition::BadAttitude;
+	Conditions[ "chaff_low" ] = Condition::ChaffLow;
+	Conditions[ "chaff_empty" ] = Condition::ChaffEmpty;
+	Conditions[ "flare_low" ] = Condition::FlareLow;
+	Conditions[ "flare_empty" ] = Condition::FlareEmpty;
+	Conditions[ "fuel_low" ] = Condition::FuelLow;
+	Conditions[ "fuel_critical" ] = Condition::FuelCritical;
+	Conditions[ "fuel_empty" ] = Condition::FuelEmpty;
+	Conditions[ "speed_lt350" ] = Condition::SpeedLT350;
+	Conditions[ "speed_lt300" ] = Condition::SpeedLT300;
+	Conditions[ "speed_lt250" ] = Condition::SpeedLT250;
+	Conditions[ "speed_gt450" ] = Condition::SpeedGT450;
+	Conditions[ "speed_gt500" ] = Condition::SpeedGT500;
+	Conditions[ "speed_gt550" ] = Condition::SpeedGT550;
+	Conditions[ "bad_speed" ] = Condition::SpeedBad;
+	
 	TextTypes[ "altitude" ] = TextType::Altitude;
 	TextTypes[ "altitude_time" ] = TextType::AltitudeTime;
 	TextTypes[ "indicated_knots" ] = TextType::IndicatedKnots;
@@ -93,7 +138,9 @@ FalconOutput::FalconOutput( void )
 	TextTypes[ "hsi_bits_1" ] = TextType::HsiBits1;
 	TextTypes[ "hsi_bits_2" ] = TextType::HsiBits2;
 	TextTypes[ "run_time" ] = TextType::RunTime;
-
+	TextTypes[ "tex_w" ] = TextType::TexW;
+	TextTypes[ "tex_h" ] = TextType::TexH;
+	
 	ImageTypes[ "attitude" ] = ImageType::Attitude;
 	ImageTypes[ "gear" ] = ImageType::Gear;
 	ImageTypes[ "airbrake" ] = ImageType::Airbrake;
@@ -109,51 +156,14 @@ FalconOutput::FalconOutput( void )
 	ImageTypes[ "screen_center_zoomed" ] = ImageType::ScreenCenterZoomed;
 	ImageTypes[ "screen_cursor" ] = ImageType::ScreenCursor;
 	ImageTypes[ "screen_cursor_zoomed" ] = ImageType::ScreenCursorZoomed;
-
-	Conditions[ "rwr_missile" ] = Condition::RWRMissile;
-	Conditions[ "rwr_lock" ] = Condition::RWRLock;
-	Conditions[ "rwr_lethal" ] = Condition::RWRLethal;
-	Conditions[ "rwr_contact" ] = Condition::RWRContact;
-	Conditions[ "caution_master" ] = Condition::CautionMaster;
-	Conditions[ "caution_altitude" ] = Condition::CautionAltitude;
-	Conditions[ "caution_stores_config" ] = Condition::CautionStoresConfig;
-	Conditions[ "caution_ecm" ] = Condition::CautionECM;
-	Conditions[ "caution_fuel" ] = Condition::CautionFuel;
-	Conditions[ "caution_oil" ] = Condition::CautionOil;
-	Conditions[ "caution_engine_fault" ] = Condition::CautionEngineFault;
-	Conditions[ "caution_avionics" ] = Condition::CautionAvionics;
-	Conditions[ "caution_flcs" ] = Condition::CautionFLCS;
-	Conditions[ "ecm" ] = Condition::ECM;
-	Conditions[ "afterburner" ] = Condition::Afterburner;
-	Conditions[ "airbrake" ] = Condition::AirBrake;
-	Conditions[ "airbrake_33" ] = Condition::AirBrake33;
-	Conditions[ "airbrake_66" ] = Condition::AirBrake66;
-	Conditions[ "airbrake_99" ] = Condition::AirBrake99;
-	Conditions[ "gear_down" ] = Condition::GearDown;
-	Conditions[ "gear_up" ] = Condition::GearUp;
-	Conditions[ "gear_moving" ] = Condition::GearMoving;
-	Conditions[ "aoa_above" ] = Condition::AOAAbove;
-	Conditions[ "aoa_below" ] = Condition::AOABelow;
-	Conditions[ "aoa_on" ] = Condition::AOAOn;
-	Conditions[ "gear_down_aoa_above" ] = Condition::GearDownAOAAbove;
-	Conditions[ "gear_down_aoa_below" ] = Condition::GearDownAOABelow;
-	Conditions[ "gear_down_aoa_on" ] = Condition::GearDownAOAOn;
-	Conditions[ "bad_attitude" ] = Condition::BadAttitude;
-	Conditions[ "chaff_low" ] = Condition::ChaffLow;
-	Conditions[ "chaff_empty" ] = Condition::ChaffEmpty;
-	Conditions[ "flare_low" ] = Condition::FlareLow;
-	Conditions[ "flare_empty" ] = Condition::FlareEmpty;
-	Conditions[ "fuel_low" ] = Condition::FuelLow;
-	Conditions[ "fuel_critical" ] = Condition::FuelCritical;
-	Conditions[ "fuel_empty" ] = Condition::FuelEmpty;
-	Conditions[ "speed_lt350" ] = Condition::SpeedLT350;
-	Conditions[ "speed_lt300" ] = Condition::SpeedLT300;
-	Conditions[ "speed_lt250" ] = Condition::SpeedLT250;
-	Conditions[ "speed_gt450" ] = Condition::SpeedGT450;
-	Conditions[ "speed_gt500" ] = Condition::SpeedGT500;
-	Conditions[ "speed_gt550" ] = Condition::SpeedGT550;
-	Conditions[ "bad_speed" ] = Condition::SpeedBad;
-
+	ImageTypes[ "tex" ] = ImageType::Tex;
+	ImageTypes[ "tex_mfd1" ] = ImageType::TexMFD1;
+	ImageTypes[ "tex_mfd2" ] = ImageType::TexMFD2;
+	ImageTypes[ "tex_rwr" ] = ImageType::TexRWR;
+	ImageTypes[ "tex_ded" ] = ImageType::TexDED;
+	ImageTypes[ "tex_hud" ] = ImageType::TexHUD;
+	ImageTypes[ "tex_hmcs" ] = ImageType::TexHMCS;
+	
 	FalconSilhouette = gcnew cli::array<System::Drawing::PointF>( 15 );
 	FalconSilhouette[  0 ].X =  0.00f;
 	FalconSilhouette[  0 ].Y = -1.00f;
@@ -186,6 +196,11 @@ FalconOutput::FalconOutput( void )
 	FalconSilhouette[ 14 ].X = -0.25f;
 	FalconSilhouette[ 14 ].Y = -0.05f;
 	ScalePoints( FalconSilhouette, 0.5, 0.5, 0.5, 0.5 );
+}
+
+
+FalconOutput::~FalconOutput()
+{
 }
 
 
@@ -316,6 +331,9 @@ bool FalconOutput::CheckCondition( F4SharedMem::FlightData ^fd, int type, double
 		case Condition::GearDownAOAOn:
 			return ( (fd->gearPos > 0.99f) && (fd->lightBits & (int)F4SharedMem::Headers::LightBits::AOAOn) );
 		
+		case Condition::OnGround:
+			return ( (fd->lightBits & (int)F4SharedMem::Headers::LightBits::WOW) || ((fd->lightBits3 & (int)F4SharedMem::Headers::Bms4LightBits3::OnGround) && (Saitek::MainThread->Config.FalconType == F4SharedMem::FalconDataFormats::BMS4)) );
+		
 		case Condition::BadAttitude:
 			return ( TO_DEG(fd->pitch) < -20 );
 		
@@ -355,7 +373,7 @@ bool FalconOutput::CheckCondition( F4SharedMem::FlightData ^fd, int type, double
 }
 
 
-void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double total_time, wchar_t *buffer, int size )
+void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double total_time, void *device, wchar_t *buffer, int size )
 {
 	bool active_sec = fmod( total_time, 2. ) > 1.;
 	bool active_half_sec = fmod( total_time, 1. ) > 0.5;
@@ -535,7 +553,12 @@ void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double tot
 		case TextType::FuelTime:
 		{
 			if( fd->fuelFlow > 0.0f )
-				swprintf_s( buffer, size, L"Fuel Time: %.0fm", fd->total / (fd->fuelFlow / 60.0f) );
+			{
+				float fuel_minutes = fd->total / (fd->fuelFlow / 60.0f);
+				int fuel_hours = (fuel_minutes + 0.5f) / 60;
+				fuel_minutes -= fuel_hours * 60;
+				swprintf_s( buffer, size, L"Fuel Time: %i:%02.0f", fuel_hours, fuel_minutes );
+			}
 		}
 		break;
 		case TextType::FuelDist:
@@ -546,10 +569,10 @@ void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double tot
 		break;
 		
 		case TextType::Chaff:
-			swprintf_s( buffer, size, L"Chaff: %.0f", fd->ChaffCount );
+			swprintf_s( buffer, size, L"Chaff: %.0f", ((fd->ChaffCount > 0.f) ? fd->ChaffCount : 0.f) );
 		break;
 		case TextType::Flares:
-			swprintf_s( buffer, size, L"Flare: %.0f", fd->FlareCount );
+			swprintf_s( buffer, size, L"Flare: %.0f", ((fd->FlareCount > 0.f) ? fd->FlareCount : 0.f) );
 		break;
 		
 		case TextType::CautionMaster:
@@ -581,38 +604,14 @@ void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double tot
 		
 		case TextType::Horizon1:
 		{
-			// FIXME: Don't do this here.
+			// FIXME: Should this happen here?
+			DrawTools[device].UpdateHorizon( fd );
 			
-			// Set up the artificial horizon bitmap.
-			System::Drawing::Bitmap ^horizon = gcnew Bitmap( 16, 3, System::Drawing::Imaging::PixelFormat::Format16bppRgb565 );
-			System::Drawing::Graphics ^horizonGfx = Graphics::FromImage( horizon );
-			System::Drawing::Color horizonEmpty = Color::Red;
-			System::Drawing::Pen ^horizonPen = gcnew Pen( Color::Green );
-			System::Drawing::SolidBrush ^horizonBrush = gcnew SolidBrush( Color::Blue );
-			array<System::Drawing::Point> ^horizonPoints = gcnew array<System::Drawing::Point>(3);
-			double charAspectRatio = 6.0/9.0;
-			
-			// Draw the artificial horizon to a bitmap in memory.
-			double rightX = cos( fd->roll );
-			double rightY = sin( fd->roll );
-			double downX = cos( fd->roll - M_PI/2. );
-			double downY = sin( fd->roll - M_PI/2. );
-			double pitchX = downX * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
-			double pitchY = downY * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
-			horizonPoints[ 0 ].X = (int)( rightX * 100.0 + 7.5 + pitchX );
-			horizonPoints[ 0 ].Y = (int)( rightY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
-			horizonPoints[ 1 ].X = (int)( rightX * -100.0 + 7.5 + pitchX );
-			horizonPoints[ 1 ].Y = (int)( rightY * -100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
-			horizonPoints[ 2 ].X = (int)( downX * 100.0 + 7.5 + pitchX );
-			horizonPoints[ 2 ].Y = (int)( downY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
-			horizonGfx->Clear( horizonEmpty );
-			horizonGfx->FillPolygon( horizonBrush, horizonPoints, System::Drawing::Drawing2D::FillMode::Alternate );
-			horizonGfx->DrawLine( horizonPen, horizonPoints[ 0 ].X, horizonPoints[ 0 ].Y, horizonPoints[ 1 ].X , horizonPoints[ 1 ].Y );
-			
+			// Draw horizon line 1.
 			wchar_t disp[3]=L"#.";
 			for( int i = 0; i < 16; i ++ )
 			{
-				float hue = horizon->GetPixel(i,2).GetHue();
+				float hue = DrawTools[device].Horizon->GetPixel(i,2).GetHue();
 				if(fabs( hue - Color::Green.GetHue() ) < 110.0)
 					buffer[i] = disp[0];
 				else if(fabs( hue - Color::Blue.GetHue() ) < 110.0)
@@ -624,38 +623,11 @@ void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double tot
 		break;
 		case TextType::Horizon2:
 		{
-			// FIXME: Don't do this here.
-			
-			// Set up the artificial horizon bitmap.
-			System::Drawing::Bitmap ^horizon = gcnew Bitmap( 16, 3, System::Drawing::Imaging::PixelFormat::Format16bppRgb565 );
-			System::Drawing::Graphics ^horizonGfx = Graphics::FromImage( horizon );
-			System::Drawing::Color horizonEmpty = Color::Red;
-			System::Drawing::Pen ^horizonPen = gcnew Pen( Color::Green );
-			System::Drawing::SolidBrush ^horizonBrush = gcnew SolidBrush( Color::Blue );
-			array<System::Drawing::Point> ^horizonPoints = gcnew array<System::Drawing::Point>(3);
-			double charAspectRatio = 6.0/9.0;
-			
-			// Draw the artificial horizon to a bitmap in memory.
-			double rightX = cos( fd->roll );
-			double rightY = sin( fd->roll );
-			double downX = cos( fd->roll - M_PI/2. );
-			double downY = sin( fd->roll - M_PI/2. );
-			double pitchX = downX * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
-			double pitchY = downY * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
-			horizonPoints[ 0 ].X = (int)( rightX * 100.0 + 7.5 + pitchX );
-			horizonPoints[ 0 ].Y = (int)( rightY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
-			horizonPoints[ 1 ].X = (int)( rightX * -100.0 + 7.5 + pitchX );
-			horizonPoints[ 1 ].Y = (int)( rightY * -100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
-			horizonPoints[ 2 ].X = (int)( downX * 100.0 + 7.5 + pitchX );
-			horizonPoints[ 2 ].Y = (int)( downY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
-			horizonGfx->Clear( horizonEmpty );
-			horizonGfx->FillPolygon( horizonBrush, horizonPoints, System::Drawing::Drawing2D::FillMode::Alternate );
-			horizonGfx->DrawLine( horizonPen, horizonPoints[ 0 ].X, horizonPoints[ 0 ].Y, horizonPoints[ 1 ].X , horizonPoints[ 1 ].Y );
-			
+			// Draw horizon line 2.
 			wchar_t disp[3]=L"#.";
 			for( int i = 0; i < 16; i ++ )
 			{
-				float hue = horizon->GetPixel(i,1).GetHue();
+				float hue = DrawTools[device].Horizon->GetPixel(i,1).GetHue();
 				if(fabs( hue - Color::Green.GetHue() ) < 110.0)
 					buffer[i] = disp[0];
 				else if(fabs( hue - Color::Blue.GetHue() ) < 110.0)
@@ -667,38 +639,11 @@ void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double tot
 		break;
 		case TextType::Horizon3:
 		{
-			// FIXME: Don't do this here.
-			
-			// Set up the artificial horizon bitmap.
-			System::Drawing::Bitmap ^horizon = gcnew Bitmap( 16, 3, System::Drawing::Imaging::PixelFormat::Format16bppRgb565 );
-			System::Drawing::Graphics ^horizonGfx = Graphics::FromImage( horizon );
-			System::Drawing::Color horizonEmpty = Color::Red;
-			System::Drawing::Pen ^horizonPen = gcnew Pen( Color::Green );
-			System::Drawing::SolidBrush ^horizonBrush = gcnew SolidBrush( Color::Blue );
-			array<System::Drawing::Point> ^horizonPoints = gcnew array<System::Drawing::Point>(3);
-			double charAspectRatio = 6.0/9.0;
-			
-			// Draw the artificial horizon to a bitmap in memory.
-			double rightX = cos( fd->roll );
-			double rightY = sin( fd->roll );
-			double downX = cos( fd->roll - M_PI/2. );
-			double downY = sin( fd->roll - M_PI/2. );
-			double pitchX = downX * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
-			double pitchY = downY * (Num::RadToDeg(fd->pitch) - 7.0) / 5.0;
-			horizonPoints[ 0 ].X = (int)( rightX * 100.0 + 7.5 + pitchX );
-			horizonPoints[ 0 ].Y = (int)( rightY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
-			horizonPoints[ 1 ].X = (int)( rightX * -100.0 + 7.5 + pitchX );
-			horizonPoints[ 1 ].Y = (int)( rightY * -100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
-			horizonPoints[ 2 ].X = (int)( downX * 100.0 + 7.5 + pitchX );
-			horizonPoints[ 2 ].Y = (int)( downY * 100.0*charAspectRatio + 1.0 + pitchY*charAspectRatio );
-			horizonGfx->Clear( horizonEmpty );
-			horizonGfx->FillPolygon( horizonBrush, horizonPoints, System::Drawing::Drawing2D::FillMode::Alternate );
-			horizonGfx->DrawLine( horizonPen, horizonPoints[ 0 ].X, horizonPoints[ 0 ].Y, horizonPoints[ 1 ].X , horizonPoints[ 1 ].Y );
-			
+			// Draw horizon line 3.
 			wchar_t disp[3]=L"#.";
 			for( int i = 0; i < 16; i ++ )
 			{
-				float hue = horizon->GetPixel(i,0).GetHue();
+				float hue = DrawTools[device].Horizon->GetPixel(i,0).GetHue();
 				if(fabs( hue - Color::Green.GetHue() ) < 110.0)
 					buffer[i] = disp[0];
 				else if(fabs( hue - Color::Blue.GetHue() ) < 110.0)
@@ -920,43 +865,53 @@ void FalconOutput::FormatText( F4SharedMem::FlightData ^fd, int type, double tot
 			swprintf_s( buffer, size, L"RunTime: %.2f sec", total_time );
 		break;
 		
+		case TextType::TexW:
+			swprintf_s( buffer, size, L"TexW: %i", Saitek::MainThread->Tex ? Saitek::MainThread->Tex->Width : 0 );
+		break;
+		case TextType::TexH:
+			swprintf_s( buffer, size, L"TexH: %i", Saitek::MainThread->Tex ? Saitek::MainThread->Tex->Height : 0 );
+		break;
+		
 		default:
 			swprintf_s( buffer, size, L"" );
 	}
 }
 
 
-void FalconOutput::DrawText( F4SharedMem::FlightData ^fd, int type, double total_time, int x, int y, System::Drawing::Graphics ^gfx, System::Drawing::Font ^font, System::Drawing::Brush ^brush )
+void FalconOutput::DrawText( F4SharedMem::FlightData ^fd, int type, double total_time, void *device, int x, int y, System::Drawing::Graphics ^gfx, System::Drawing::Font ^font, System::Drawing::Brush ^brush )
 {
 	wchar_t buffer[ 1024 ];
-	FormatText( fd, type, total_time, buffer, 1024 );
-	gfx->DrawString( gcnew System::String( buffer ), font, brush, (float)( x ), (float)( y ) );
+	FormatText( fd, type, total_time, device, buffer, 1024 );
+	
+	System::String ^str = gcnew System::String( buffer );
+	gfx->DrawString( str, font, brush, (float)( x ), (float)( y ) );
+	delete str;
 }
 
 
-void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double total_time, int x, int y, int w, int h, System::Drawing::Graphics ^gfx )
+void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, int type, double total_time, void *device, int x, int y, int w, int h, System::Drawing::Graphics ^gfx )
 {
 	bool active_sec = (fmod( total_time, 2. ) > 1.);
 	bool active_half_sec = (fmod( total_time, 1. ) > 0.5);
 	bool active_quarter_sec = (fmod( total_time, 0.5 ) > 0.25);
 	bool active_eighth_sec = (fmod( total_time, 0.25 ) > 0.125);
-
+	
 	using namespace System::Drawing;
-
-	Brush ^black_brush = gcnew SolidBrush( Color::Black );
-	Brush ^red_brush = gcnew SolidBrush( Color::Red );
-	Brush ^green_brush = gcnew SolidBrush( Color::Green );
-	Brush ^blue_brush = gcnew SolidBrush( Color::Blue );
-	Brush ^yellow_brush = gcnew SolidBrush( Color::Yellow );
-	Brush ^magenta_brush = gcnew SolidBrush( Color::Magenta );
-	Brush ^grey_brush = gcnew SolidBrush( Color::Gray );
-	Brush ^brown_brush = gcnew SolidBrush( Color::Brown );
-
-	Pen ^white_pen = gcnew Pen( Color::White );
-	Pen ^green_pen = gcnew Pen( Color::Green );
-	Pen ^orange_pen = gcnew Pen( Color::Orange );
-	Pen ^grey_pen = gcnew Pen( Color::Gray );
-
+	
+	Brush ^black_brush = DrawTools[device].GetBrush( Color::Black );
+	Brush ^red_brush = DrawTools[device].GetBrush( Color::Red );
+	Brush ^green_brush = DrawTools[device].GetBrush( Color::Green );
+	Brush ^blue_brush = DrawTools[device].GetBrush( Color::Blue );
+	Brush ^yellow_brush = DrawTools[device].GetBrush( Color::Yellow );
+	Brush ^magenta_brush = DrawTools[device].GetBrush( Color::Magenta );
+	Brush ^grey_brush = DrawTools[device].GetBrush( Color::Gray );
+	Brush ^brown_brush = DrawTools[device].GetBrush( Color::Brown );
+	
+	Pen ^white_pen = DrawTools[device].GetPen( Color::White );
+	Pen ^green_pen = DrawTools[device].GetPen( Color::Green );
+	Pen ^orange_pen = DrawTools[device].GetPen( Color::Orange );
+	Pen ^grey_pen = DrawTools[device].GetPen( Color::Gray );
+	
 	switch( type )
 	{
 		case ImageType::Attitude:
@@ -965,7 +920,7 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			gfx->FillEllipse( brown_brush, x, y, w, h );
 			gfx->FillPie( blue_brush, (float)( x ), (float)( y ), (float)( w ), (float)( h ), TO_DEG( -1.f * fd->roll ) + 180.f, 180.f );
 			gfx->DrawEllipse( white_pen, x, y, w, h );
-
+			
 			// Draw markings on roll indicator.
 			gfx->DrawPie( white_pen, (float)( x ), (float)( y ), (float)( w ), (float)( h ), TO_DEG( -1.f * fd->roll ), 180.f );
 			gfx->DrawPie( white_pen, (float)( x ), (float)( y ), (float)( w ), (float)( h ), TO_DEG( -1.f * fd->roll ) - 90.f, 180.f );
@@ -973,12 +928,14 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			gfx->DrawPie( white_pen, (float)( x ), (float)( y ), (float)( w ), (float)( h ), TO_DEG( -1.f * fd->roll ) - 60.f, -90.f );
 			gfx->DrawPie( white_pen, (float)( x ), (float)( y ), (float)( w ), (float)( h ), TO_DEG( -1.f * fd->roll ) - 70.f, -30.f );
 			gfx->DrawPie( white_pen, (float)( x ), (float)( y ), (float)( w ), (float)( h ), TO_DEG( -1.f * fd->roll ) - 80.f, -30.f );
-
+			
 			// Clip drawing to the inner circle.
 			Drawing2D::GraphicsPath ^clip_path = gcnew Drawing2D::GraphicsPath();
 			clip_path->AddEllipse( x + w/8.f, y + h/8.f, w*3.f/4.f, h*3.f/4.f );
+			delete gfx->Clip;
 			gfx->Clip = gcnew Region( clip_path );
-
+			delete clip_path;
+			
 			// Draw attitude indicator inside.
 			gfx->FillRectangle( brown_brush, x, y, w, h );
 			cli::array<PointF> ^sky_points = gcnew cli::array<PointF>( 3 );
@@ -1006,6 +963,8 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			}
 			
 			// Restore full-image drawing.
+			delete sky_points;
+			delete gfx->Clip;
 			gfx->Clip = gcnew Region( System::Drawing::Rectangle( 0, 0, 320, 240 ) );
 
 			// Draw inner border.
@@ -1017,6 +976,7 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			gfx->DrawLine( orange_pen, x + w/2.f, y + h/8.f, x + w/2.f, y + h/4.f );
 		}
 		break;
+
 		case ImageType::RWRSimple:
 		{
 			// Draw our plane's silhouette.
@@ -1048,6 +1008,7 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			}
 		}
 		break;
+
 		case ImageType::Throttle:
 		{
 			float rpm_h = fd->rpm * h / 200.f;
@@ -1058,6 +1019,7 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			gfx->DrawLine( grey_pen, x, y+h/2, x+w, y+h/2 );
 		}
 		break;
+
 		case ImageType::PitchTrim:
 		{
 			gfx->DrawPie( grey_pen, x-w, y, w*2, h, 270, 180 );
@@ -1076,6 +1038,7 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			gfx->FillPie( yellow_brush, (float)x, (float)y, (float)w, (float)(h*2), 269.f - fd->TrimYaw*180.f, 2.f );
 		}
 		break;
+
 		case ImageType::ILS:
 		{
 			float horizontal = (fd->AdiIlsHorPos + 1.f) / 2.f;
@@ -1087,6 +1050,7 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			gfx->DrawLine( orange_pen, x + w*.5f, y + h*.4f, x + w*.5f, y + h*.6f );
 		}
 		break;
+
 		case ImageType::Gear:
 		{
 			Brush ^brush;
@@ -1101,26 +1065,31 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			gfx->DrawEllipse( grey_pen, x, y, w, h );
 		}
 		break;
+
 		case ImageType::Airbrake:
 		{
 			gfx->DrawPie( grey_pen, x-w, y, w*2, h, 270, 180 );
 			gfx->FillPie( red_brush, (float)(x-w), (float)y, (float)(w*2), (float)h, fd->speedBrake * -90.f, fd->speedBrake * 180.f );
 		}
 		break;
+
 		case ImageType::ScreenCopy:
 		{
 			try
 			{
 				Bitmap ^tmp_bmp = gcnew Bitmap( Screen::PrimaryScreen->Bounds.Width, Screen::PrimaryScreen->Bounds.Height, Imaging::PixelFormat::Format24bppRgb );
 				Graphics ^tmp_gfx = Graphics::FromImage( tmp_bmp );
+				
 				tmp_gfx->CopyFromScreen( Screen::PrimaryScreen->Bounds.X, Screen::PrimaryScreen->Bounds.Y, 0, 0, System::Drawing::Size( Screen::PrimaryScreen->Bounds.Width, Screen::PrimaryScreen->Bounds.Height ) );
 				gfx->DrawImage( tmp_bmp, x, y, w, h );
+				
 				delete tmp_gfx;
 				delete tmp_bmp;
 			}
 			catch( ... ){}
 		}
 		break;
+		
 		case ImageType::ScreenCenter:
 		{
 			try
@@ -1135,10 +1104,11 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 			try
 			{
 				Bitmap ^tmp_bmp = gcnew Bitmap( w / 2, h / 2, Imaging::PixelFormat::Format24bppRgb );
-				Graphics ^tmp_gfx = Graphics::FromImage( tmp_bmp );\
-
+				Graphics ^tmp_gfx = Graphics::FromImage( tmp_bmp );
+				
 				tmp_gfx->CopyFromScreen( (Screen::PrimaryScreen->Bounds.Width - (w/2)) / 2 + Screen::PrimaryScreen->Bounds.X, (Screen::PrimaryScreen->Bounds.Height - (h/2)) / 2 + Screen::PrimaryScreen->Bounds.Y, x, y, System::Drawing::Size( w/2, h/2 ) );
 				gfx->DrawImage( tmp_bmp, x, y, w, h );
+				
 				delete tmp_gfx;
 				delete tmp_bmp;
 			}
@@ -1155,7 +1125,7 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 				if( y1 < Screen::PrimaryScreen->Bounds.Y ) y1 = Screen::PrimaryScreen->Bounds.Y;
 				if( x1 + w > Screen::PrimaryScreen->Bounds.Width ) x1 = Screen::PrimaryScreen->Bounds.Width - w;
 				if( y1 + h > Screen::PrimaryScreen->Bounds.Height ) y1 = Screen::PrimaryScreen->Bounds.Height - h;
-
+				
 				gfx->CopyFromScreen( x1, y1, x, y, System::Drawing::Size( w, h ) );
 			}
 			catch( ... ){}
@@ -1177,8 +1147,85 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, int type, double tota
 
 				tmp_gfx->CopyFromScreen( x1, y1, x, y, System::Drawing::Size( w/2, h/2 ) );
 				gfx->DrawImage( tmp_bmp, x, y, w, h );
+				
 				delete tmp_gfx;
 				delete tmp_bmp;
+			}
+			catch( ... ){}
+		}
+		break;
+		
+		case ImageType::Tex:
+		{
+			try
+			{
+				gfx->DrawImage( tex, x, y, w, h );
+			}
+			catch( ... ){}
+		}
+		break;
+		case ImageType::TexMFD1:
+		{
+			try
+			{
+				System::Drawing::Bitmap ^region = tex->Clone( System::Drawing::Rectangle(750,750,450,450), System::Drawing::Imaging::PixelFormat::Format32bppArgb );
+				gfx->DrawImage( region, x, y, w, h );
+				delete region;
+			}
+			catch( ... ){}
+		}
+		break;
+		case ImageType::TexMFD2:
+		{
+			try
+			{
+				System::Drawing::Bitmap ^region = tex->Clone( System::Drawing::Rectangle(750,290,450,450), System::Drawing::Imaging::PixelFormat::Format32bppArgb );
+				gfx->DrawImage( region, x, y, w, h );
+				delete region;
+			}
+			catch( ... ){}
+		}
+		break;
+		case ImageType::TexRWR:
+		{
+			try
+			{
+				System::Drawing::Bitmap ^region = tex->Clone( System::Drawing::Rectangle(964,0,236,236), System::Drawing::Imaging::PixelFormat::Format32bppArgb );
+				gfx->DrawImage( region, x, y, w, h );
+				delete region;
+			}
+			catch( ... ){}
+		}
+		break;
+		case ImageType::TexDED:
+		{
+			try
+			{
+				System::Drawing::Bitmap ^region = tex->Clone( System::Drawing::Rectangle(570,150,380,130), System::Drawing::Imaging::PixelFormat::Format32bppArgb );
+				gfx->DrawImage( region, x, y, w, h );
+				delete region;
+			}
+			catch( ... ){}
+		}
+		break;
+		case ImageType::TexHUD:
+		{
+			try
+			{
+				System::Drawing::Bitmap ^region = tex->Clone( System::Drawing::Rectangle(0,0,560,560), System::Drawing::Imaging::PixelFormat::Format32bppArgb );
+				gfx->DrawImage( region, x, y, w, h );
+				delete region;
+			}
+			catch( ... ){}
+		}
+		break;
+		case ImageType::TexHMCS:
+		{
+			try
+			{
+				System::Drawing::Bitmap ^region = tex->Clone( System::Drawing::Rectangle(0,630,570,570), System::Drawing::Imaging::PixelFormat::Format32bppArgb );
+				gfx->DrawImage( region, x, y, w, h );
+				delete region;
 			}
 			catch( ... ){}
 		}

@@ -16,6 +16,8 @@ namespace Raptor007sFalcon4toSaitekUtility
 
 namespace Saitek
 {
+	extern float Version;
+	
 	extern FalconOutput Output;
 	
 	extern CDirectOutput DO;
@@ -30,12 +32,17 @@ namespace Saitek
 	
 	extern msclr::auto_gcroot<FalconThread^> MainThread;
 	
+	extern std::map<std::string,WORD> KeyMap;
+	
+	
+	void InitKeyMap( void );
 	
 	void GenerateDefaults( void );
 	void LoadConfigs( void );
 	void LoadConfig( std::string name );
 	DeviceConfig *NewConfig( std::string guid );
 	void SaveConfigs( void );
+	
 	void Initialize( void );
 	void Deinitialize( void );
 	void __stdcall EnumerateCallback( void *device, void *ctxt );

@@ -44,7 +44,20 @@ void FalconConfig::Load( void )
 				
 				// Execute one command.
 				if( cmd_vec.size() )
-					LoadLine( cmd_vec );
+				{
+					if( (cmd_vec[0] == "min_version") && (cmd_tokens.size() >= 2) )
+					{
+						float min_version = atof( cmd_vec[1].c_str() );
+						if( (min_version - 0.0001f) > Saitek::Version )
+						{
+							// FIXME: Be more descriptive.
+							System::Windows::Forms::MessageBox::Show( "Couldn't load: settings.cfg", "Couldn't Load Settings", System::Windows::Forms::MessageBoxButtons::OK, System::Windows::Forms::MessageBoxIcon::Error );
+							break;
+						}
+					}
+					else
+						LoadLine( cmd_vec );
+				}
 			}
 		}
 		catch( ... ){}
@@ -140,7 +153,13 @@ void FalconConfig::LoadLine( std::vector<std::string> cmd_tokens )
 	}
 	else if( (cmd == "config") && (cmd_tokens.size() >= 3) )
 	{
-		// FIXME
+		System::String ^guid_str = gcnew System::String( cmd_tokens[ 1 ].c_str() );
+		System::String ^config_name = gcnew System::String( cmd_tokens[ 2 ].c_str() );
+		
+		if( ! StartupConfigs.ContainsKey( guid_str ) )
+			StartupConfigs[ guid_str ] = gcnew System::Collections::Generic::List<System::String^>;
+		
+		StartupConfigs[ guid_str ]->Add( config_name );
 	}
 }
 
@@ -156,7 +175,7 @@ void FalconConfig::Save( void )
 	
 	fprintf( config_file, "// Raptor007's Falcon 4 to Saitek Utility\n\n" );
 	fprintf( config_file, "min_version 2.0\n" );
-	fprintf( config_file, "version 2.0\n\n" );
+	fprintf( config_file, "version %.1f\n\n", Saitek::Version );
 	
 	if( FalconType == F4SharedMem::FalconDataFormats::AlliedForce )
 		fprintf( config_file, "falcon alliedforce\n\n" );
@@ -202,11 +221,15 @@ void FalconConfig::Save( void )
 		
 		if( falcon_type_string )
 		{
-			fprintf( config_file, "path %s \"%s\"\n", falcon_type_string, (char*) System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi( iter->Current.Value ).ToPointer() );
+			char *falcon_path = (char*) System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi( iter->Current.Value ).ToPointer();
+			fprintf( config_file, "path %s \"%s\"\n", falcon_type_string, falcon_path );
+			System::Runtime::InteropServices::Marshal::FreeHGlobal( System::IntPtr( falcon_path ) );
 			
 			try
 			{
-				fprintf( config_file, "param %s \"%s\"\n", falcon_type_string, (char*) System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi( FalconParameters[falcon_type] ).ToPointer() );
+				char *falcon_params = (char*) System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi( FalconParameters[falcon_type] ).ToPointer();
+				fprintf( config_file, "param %s \"%s\"\n", falcon_type_string, falcon_params );
+				System::Runtime::InteropServices::Marshal::FreeHGlobal( System::IntPtr( falcon_params ) );
 			}
 			catch( ... ){}
 			

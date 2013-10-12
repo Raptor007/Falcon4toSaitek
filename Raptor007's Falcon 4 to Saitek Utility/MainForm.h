@@ -75,6 +75,8 @@ namespace Raptor007sFalcon4toSaitekUtility
 	private: System::Windows::Forms::Button^  DeleteConfigButton;
 
 
+
+
 	private:
 		/// <summary>
 		/// Required designer variable.
@@ -412,13 +414,12 @@ namespace Raptor007sFalcon4toSaitekUtility
 			// 
 			this->ForumLink->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left) 
 				| System::Windows::Forms::AnchorStyles::Right));
-			this->ForumLink->AutoSize = true;
-			this->ForumLink->Location = System::Drawing::Point(174, 412);
+			this->ForumLink->Location = System::Drawing::Point(148, 412);
 			this->ForumLink->Name = L"ForumLink";
-			this->ForumLink->Size = System::Drawing::Size(330, 13);
+			this->ForumLink->Size = System::Drawing::Size(382, 13);
 			this->ForumLink->TabIndex = 4;
 			this->ForumLink->TabStop = true;
-			this->ForumLink->Text = L"Check for Updates and Report Bugs at My SaitekForum.com Thread";
+			this->ForumLink->Text = L"Check for Updates at Raptor007.com";
 			this->ForumLink->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			this->ForumLink->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainForm::ForumLink_LinkClicked);
 			// 
@@ -435,7 +436,7 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->Controls->Add(this->InstanceGroup);
 			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
 			this->Name = L"MainForm";
-			this->Text = L"Raptor007\'s Falcon 4 to Saitek Utility 2.0";
+			this->Text = L"Raptor007\'s Falcon 4 to Saitek Utility 2.1";
 			this->Load += gcnew System::EventHandler(this, &MainForm::MainForm_Load);
 			this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &MainForm::MainForm_FormClosing);
 			this->InstanceGroup->ResumeLayout(false);
@@ -446,12 +447,14 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->FalconGroup->ResumeLayout(false);
 			this->FalconGroup->PerformLayout();
 			this->ResumeLayout(false);
-			this->PerformLayout();
 
 		}
 #pragma endregion
 private: System::Void MainForm_Load( System::Object ^sender, System::EventArgs ^e )
 		{
+			// Populate the keymap (key names to scancodes).
+			Saitek::InitKeyMap();
+			
 			// Select AlliedForce by default.
 			try
 			{
@@ -501,9 +504,51 @@ private: System::Void MainForm_Load( System::Object ^sender, System::EventArgs ^
 			else if( falcon_type == F4SharedMem::FalconDataFormats::FreeFalcon5 )
 				FalconType->SelectedIndex = 5;
 			
+			// Update list of configs.
 			Saitek::ConfigsChanged = true;
 			ConfigListBox_Update( sender, e );
+			
+			// Start talking to DirectOutput.
 			Saitek::Initialize();
+			
+			// Assign configs.
+			Saitek::InstancesLock->WaitOne();
+			std::map< std::string, int > counts;
+			for( std::vector<DeviceInstance*>::iterator inst_iter = Saitek::Instances.begin(); inst_iter != Saitek::Instances.end(); inst_iter ++ )
+			{
+				std::string guid = (*inst_iter)->GuidString();
+				if( counts.find(guid) == counts.end() )
+					counts[ guid ] = 0;
+				
+				try
+				{
+					System::String ^guid_str = gcnew System::String( guid.c_str() );
+					if( Saitek::MainThread->Config.StartupConfigs.ContainsKey(guid_str) && (counts[guid] < Saitek::MainThread->Config.StartupConfigs[guid_str]->Count) )
+					{
+						System::String ^config_name_str = Saitek::MainThread->Config.StartupConfigs[ guid_str ][ counts[guid] ];
+						if( config_name_str->Length )
+						{
+							// There was a config selected for this device, so find it and select it.
+							char *config_name_ptr = (char*) System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi( config_name_str ).ToPointer();
+							std::string config_name( config_name_ptr );
+							System::Runtime::InteropServices::Marshal::FreeHGlobal( System::IntPtr( config_name_ptr ) );
+							std::map<std::string, DeviceConfig*>::iterator config_iter = Saitek::Configs.find( config_name );
+							if( config_iter != Saitek::Configs.end() )
+								(*inst_iter)->Config = config_iter->second;
+						}
+						else
+							// This device was disabled intentionally, so unselect the config.
+							(*inst_iter)->Config = NULL;
+					}
+					delete guid_str;
+				}
+				catch( ... ){}
+				
+				counts[ guid ] ++;
+			}
+			Saitek::InstancesLock->ReleaseMutex();
+			
+			// Update form.
 			InstanceListBox_Update( sender, e );
 			InstanceListBox_SelectedIndexChanged( sender, e );
 			ConfigListBox_SelectedIndexChanged( sender, e );
@@ -555,6 +600,7 @@ private: System::Void StartButton_Click( System::Object ^sender, System::EventAr
 				System::Threading::ThreadStart ^thread_start = gcnew System::Threading::ThreadStart( Saitek::MainThread.get(), &(FalconThread::Code) );
 				System::Threading::Thread ^thread = gcnew System::Threading::Thread( thread_start );
 				thread->Start();
+				delete thread_start;
 				StartButton->Text = "Stop";
 				StartButton->Enabled = true;
 			}
@@ -670,7 +716,7 @@ private: System::Void ConfigListBox_Update( System::Object ^sender, System::Even
 		}
 private: System::Void ForumLink_LinkClicked( System::Object ^sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs ^e )
 		{
-			System::Diagnostics::Process::Start( "http://www.saitekforum.com/showthread.php?t=16028" );
+			System::Diagnostics::Process::Start( "http://www.raptor007.com/falcon-4-to-saitek/" );
 		}
 private: System::Void WaitForFalcon_CheckedChanged( System::Object ^sender, System::EventArgs ^e )
 		{
@@ -776,6 +822,8 @@ private: System::Void FalconBrowseButton_Click( System::Object ^sender, System::
 			if( falcon_exe_box->FileName->Length )
 				FalconPath->Text = falcon_exe_box->FileName;
 			
+			delete falcon_exe_box;
+			
 			// Restore the working directory.
 			System::Environment::CurrentDirectory = working_dir;
 		}
@@ -867,7 +915,8 @@ private: System::Void DeleteConfigButton_Click( System::Object ^sender, System::
 			
 			if( cfg_name.size() )
 			{
-				System::Windows::Forms::DialogResult result = System::Windows::Forms::MessageBox::Show( "Are you sure you want to delete " + gcnew System::String(cfg_name.c_str()) + ".cfg?", "Really Delete " + gcnew System::String(cfg_name.c_str()) + ".cfg?", System::Windows::Forms::MessageBoxButtons::YesNo, System::Windows::Forms::MessageBoxIcon::Exclamation );
+				System::String ^cfg_name_str = gcnew System::String(cfg_name.c_str());
+				System::Windows::Forms::DialogResult result = System::Windows::Forms::MessageBox::Show( "Are you sure you want to delete " + cfg_name_str + ".cfg?", "Really Delete " + cfg_name_str + ".cfg?", System::Windows::Forms::MessageBoxButtons::YesNo, System::Windows::Forms::MessageBoxIcon::Exclamation );
 				if( result == System::Windows::Forms::DialogResult::Yes )
 				{
 					std::map< std::string, DeviceConfig* >::iterator cfg_iter = Saitek::Configs.find(cfg_name);
@@ -904,7 +953,12 @@ private: System::Void DeleteConfigButton_Click( System::Object ^sender, System::
 					std::string cmd = std::string("move \"Configs\\") + cfg_name + std::string(".cfg\" \"Configs\\") + cfg_name + std::string(".bak\"");
 					system( cmd.c_str() );
 				}
+				delete cfg_name_str;
 			}
+		}
+private: System::Void EmailLink_LinkClicked( System::Object ^sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs ^e )
+		{
+			System::Diagnostics::Process::Start( "mailto://blair@datapro.net" );
 		}
 };
 }

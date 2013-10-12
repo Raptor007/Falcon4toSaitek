@@ -202,11 +202,11 @@ private: System::Void DeviceType_SelectedIndexChanged ( System::Object ^sender, 
 			if( (DeviceType->SelectedIndex >= 0) && (ConfigName->Text->Length > 0) && (! ConfigName->Text->Contains("/")) && (! ConfigName->Text->Contains("\\")) && (! ConfigName->Text->Contains("\"")) )
 			{
 				const char *name_ptr = (const char *) (System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi( ConfigName->Text )).ToPointer();
+				std::string name = std::string(name_ptr);
+				System::Runtime::InteropServices::Marshal::FreeHGlobal( System::IntPtr( (void*) name_ptr ) );
 				
 				// Don't enable OKButton if the config name is already in use.
-				OKButton->Enabled = (Saitek::Configs.find( std::string(name_ptr) ) == Saitek::Configs.end());
-				
-				System::Runtime::InteropServices::Marshal::FreeHGlobal( System::IntPtr( (void*) name_ptr ) );
+				OKButton->Enabled = (Saitek::Configs.find( name ) == Saitek::Configs.end());
 			}
 			else
 				OKButton->Enabled = false;

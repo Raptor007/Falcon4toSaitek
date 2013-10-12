@@ -3,6 +3,8 @@
 #include <cmath>
 #include "Saitek.h"
 #include "FalconOutput.h"
+#include "Str.h"
+#include <windows.h>
 
 
 FIPInstance::FIPInstance( void *saitek_device, FIPConfig *config ) : DeviceInstance( saitek_device, config, DeviceType_Fip )
@@ -49,12 +51,12 @@ void FIPInstance::End( void )
 	UnregisterCallbacks();
 }
 
-void FIPInstance::Update( F4SharedMem::FlightData ^fd, double total_time )
+void FIPInstance::Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, double total_time )
 {
 	if(!( SaitekDevice && Config && Saitek::Initialized ))
 		return;
 	FIPConfig *Config = (FIPConfig *) this->Config;
-
+	
 	using namespace System::Drawing;
 	Graphics ^gfx = Bmp.GetGraphics();
 	gfx->Clear( Color::Black );
@@ -66,12 +68,12 @@ void FIPInstance::Update( F4SharedMem::FlightData ^fd, double total_time )
 
 		// Draw all layers.
 		for( std::vector<FIPLayer*>::iterator layer_iter = page->Layers.begin(); layer_iter != page->Layers.end(); layer_iter ++ )
-			(*layer_iter)->Draw( fd, gfx, total_time );
+			(*layer_iter)->Draw( fd, tex, gfx, total_time, SaitekDevice );
 	}
-
+	
 	// Draw button labels.
-	Brush ^label_brush = gcnew SolidBrush( Color::LightGray );
-	Brush ^selected_label_brush = gcnew SolidBrush( Color::White );
+	Brush ^label_brush = Saitek::Output.DrawTools[SaitekDevice].GetBrush( Color::LightGray );
+	Brush ^selected_label_brush = Saitek::Output.DrawTools[SaitekDevice].GetBrush( Color::White );
 	Font ^label_font = gcnew Font( FontFamily::GenericSansSerif, 10.f, FontStyle::Regular );
 	Font ^selected_label_font = gcnew Font( FontFamily::GenericSansSerif, 10.f, FontStyle::Bold );
 	for( size_t page_num = 0; page_num < Config->Pages.size(); page_num ++ )
@@ -93,14 +95,188 @@ void FIPInstance::Update( F4SharedMem::FlightData ^fd, double total_time )
 			page->LED.ApplyLook( fd, total_time, SaitekDevice, 0 );
 		}
 	}
-
+	delete label_font;
+	delete selected_label_font;
+	
 	// Set other LEDs.
 	Saitek::DO.SetLed( SaitekDevice, 0, 0, true );
 	for( int led = Config->Pages.size() + 1; led <= 6; led ++ )
 		Saitek::DO.SetLed( SaitekDevice, 0, led, false );
-
+	
 	// Update the FIP image display.
 	Saitek::DO.SetImage( SaitekDevice, 0, 0, 320*240*3, Bmp.GetBuffer() );
+}
+
+void FIPInstance::ChangedButton( DWORD button, bool state )
+{
+	std::string button_name;
+	int goto_page = -1;
+	bool skip_release_event = false;
+	
+	if( button == SoftButton_1 )
+	{
+		button_name = "s1";
+		if( state ){ goto_page = 0; skip_release_event = true; }
+	}
+	else if( button == SoftButton_2 )
+	{
+		button_name = "s2";
+		if( state ){ goto_page = 1; skip_release_event = true; }
+	}
+	else if( button == SoftButton_3 )
+	{
+		button_name = "s3";
+		if( state ){ goto_page = 2; skip_release_event = true; }
+	}
+	else if( button == SoftButton_4 )
+	{
+		button_name = "s4";
+		if( state ){ goto_page = 3; skip_release_event = true; }
+	}
+	else if( button == SoftButton_5 )
+	{
+		button_name = "s5";
+		if( state ){ goto_page = 4; skip_release_event = true; }
+	}
+	else if( button == SoftButton_6 )
+	{
+		button_name = "s6";
+		if( state ){ goto_page = 5; skip_release_event = true; }
+	}
+	else if( button == SoftButton_Right )
+		button_name = "left_minus";
+	else if( button == SoftButton_Left )
+		button_name = "left_plus";
+	else if( button == SoftButton_Down )
+		button_name = "right_minus";
+	else if( button == SoftButton_Up )
+		button_name = "right_plus";
+	
+	// Initially assume the button event will be a page change.
+	bool found_bind = false;
+	
+	// Determine the binds to search for.
+	std::vector<std::string> button_names;
+	if( button_name.length() )
+	{
+		if( state )
+		{
+			button_names.push_back( button_name );
+			button_names.push_back( std::string("+") + button_name );
+		}
+		else
+			button_names.push_back( std::string("-") + button_name );
+	}
+	
+	// Loop through all button events to see if any are bound to key events.
+	for( std::vector<std::string>::iterator name_iter = button_names.begin(); name_iter != button_names.end(); name_iter ++ )
+	{
+		std::string bind;
+		bool bind_found = false;
+		
+		// See if this button is bound for this page.
+		std::map<std::string,std::string>::iterator bind_find = ((FIPConfig*)Config)->Pages[SelectedPage]->KeyBinds.find( *name_iter );
+		if( bind_find != ((FIPConfig*)Config)->Pages[SelectedPage]->KeyBinds.end() )
+		{
+			bind = bind_find->second;
+			bind_found = true;
+		}
+		else
+		{
+			// See if this button is bound for this device.
+			bind_find = Config->KeyBinds.find( *name_iter );
+			if( bind_find != Config->KeyBinds.end() )
+			{
+				bind = bind_find->second;
+				bind_found = true;
+			}
+		}
+		
+		if( bind_found )
+		{
+			// If this button is bound to key events, don't change pages.
+			goto_page = -1;
+			
+			// If we do anything with +button, don't ignore -button, even if the page changes.
+			if( (*name_iter)[ 0 ] == '+' )
+				skip_release_event = false;
+			
+			// Split to a vector of strings, one per key event.
+			std::vector<std::string> binds = Str::SplitToVector( bind.c_str(), " " );
+			for( std::vector<std::string>::iterator bind_iter = binds.begin(); bind_iter != binds.end(); bind_iter ++ )
+			{
+				// Determine if this is a hold/release event or a quick press.
+				char bind_prefix = (*bind_iter)[ 0 ];
+				if( (bind_prefix != '+') && (bind_prefix != '-') )
+					bind_prefix = 0;
+				
+				// Get the keyname.
+				std::string bind = (bind_prefix ? (*bind_iter).substr(1) : *bind_iter);
+				
+				// Determine the key's scancode.
+				WORD scancode = 0;
+				if( bind[ 0 ] == '#' )
+				{
+					// Use raw numeric value as scancode.
+					scancode = atoi( bind.substr(1).c_str() );
+				}
+				else if( bind[ 0 ] == '@' )
+				{
+					// Go to the page specified.
+					goto_page = atoi( bind.substr(1).c_str() ) - 1;
+				}
+				else
+				{
+					// Look up the scancode in the keymap.
+					std::map<std::string,WORD>::iterator key_find = Saitek::KeyMap.find(bind);
+					if( key_find != Saitek::KeyMap.end() )
+						scancode = key_find->second;
+				}
+				
+				// If we have a valid scancode, send the key events.
+				if( scancode )
+				{
+					// This structure will be used to create the keyboard input event.
+					INPUT ip;
+					
+					// Set up a generic keyboard event.
+					ip.type = INPUT_KEYBOARD;
+					ip.ki.wVk = 0;
+					ip.ki.wScan = 0;
+					ip.ki.time = 0;
+					ip.ki.dwExtraInfo = 0;
+					
+					// Get the scancode.
+					ip.ki.wScan = scancode;
+					
+					if( bind_prefix != '-' )
+					{
+						// Press the key.
+						ip.ki.dwFlags = KEYEVENTF_SCANCODE;
+						SendInput( 1, &ip, sizeof(INPUT) );
+					}
+					
+					if( bind_prefix != '+' )
+					{
+						// Release the key.
+						ip.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+						SendInput( 1, &ip, sizeof(INPUT) );
+					}
+				}
+			}
+		}
+	}
+	
+	if( goto_page >= 0 )
+	{
+		int prev_page = SelectedPage;
+		
+		SetPage( goto_page );
+		
+		// If we changed pages, we might want to ignore the button-up event that follows.
+		if( skip_release_event && (SelectedPage != prev_page) )
+			Buttons ^= button;
+	}
 }
 
 void FIPInstance::SetPage( int page )
@@ -128,6 +304,8 @@ const char *FIPConfig::TypeString( void )
 
 void FIPConfig::Clear( void )
 {
+	DeviceConfig::Clear();
+	
 	for( std::vector<FIPPage*>::iterator page_iter = Pages.begin(); page_iter != Pages.end(); page_iter ++ )
 	{
 		delete *page_iter;
@@ -139,6 +317,8 @@ void FIPConfig::Clear( void )
 
 void FIPConfig::LoadLine( std::vector<std::string> cmd_tokens )
 {
+	DeviceConfig::LoadLine( cmd_tokens );
+	
 	if( cmd_tokens.size() < 3 )
 		return;
 	if( cmd_tokens[ 0 ] != "screen" )
@@ -206,10 +386,16 @@ void FIPConfig::LoadLine( std::vector<std::string> cmd_tokens )
 		System::Drawing::Brush ^brush = gcnew System::Drawing::SolidBrush( System::Drawing::Color::White );
 		Pages[ screen ]->Layers.push_back( new FIPText( text, x, y, font, brush ) );
 	}
+	else if( (cmd == "bind") && (cmd_tokens.size() >= 5) )
+	{
+		Pages[ screen ]->KeyBinds[ cmd_tokens[3] ] = cmd_tokens[ 4 ];
+	}
 }
 
 void FIPConfig::SaveLines( FILE *config_file )
 {
+	DeviceConfig::SaveLines( config_file );
+	
 	for( size_t i = 0; i < Pages.size(); i ++ )
 	{
 		const char *color = "off";
@@ -268,6 +454,9 @@ void FIPConfig::SaveLines( FILE *config_file )
 			}
 		}
 		
+		for( std::map<std::string,std::string>::iterator bind_iter = Pages[ i ]->KeyBinds.begin(); bind_iter != Pages[ i ]->KeyBinds.end(); bind_iter ++ )
+			fprintf( config_file, "screen %i bind \"%s\" \"%s\"\n", i + 1, bind_iter->first.c_str(), bind_iter->second.c_str() );
+		
 		fprintf( config_file, "\n" );
 	}
 }
@@ -307,9 +496,9 @@ FIPImage::~FIPImage()
 {
 }
 
-void FIPImage::Draw( F4SharedMem::FlightData ^fd, System::Drawing::Graphics ^gfx, double total_time )
+void FIPImage::Draw( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, System::Drawing::Graphics ^gfx, double total_time, void *device )
 {
-	Saitek::Output.DrawImage( fd, Type, total_time, X, Y, W, H, gfx );
+	Saitek::Output.DrawImage( fd, tex, Type, total_time, device, X, Y, W, H, gfx );
 }
 
 
@@ -327,7 +516,7 @@ FIPText::~FIPText()
 {
 }
 
-void FIPText::Draw( F4SharedMem::FlightData ^fd, System::Drawing::Graphics ^gfx, double total_time )
+void FIPText::Draw( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, System::Drawing::Graphics ^gfx, double total_time, void *device )
 {
-	Saitek::Output.DrawText( fd, Type, total_time, X, Y, gfx, TextFont.get(), TextBrush.get() );
+	Saitek::Output.DrawText( fd, Type, total_time, device, X, Y, gfx, TextFont.get(), TextBrush.get() );
 }

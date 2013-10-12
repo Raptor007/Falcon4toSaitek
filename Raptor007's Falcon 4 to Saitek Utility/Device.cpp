@@ -41,6 +41,7 @@ DeviceConfig::~DeviceConfig()
 
 void DeviceConfig::Clear( void )
 {
+	KeyBinds.clear();
 }
 
 void DeviceConfig::Load( void )
@@ -51,6 +52,7 @@ void DeviceConfig::Load( void )
 	std::ifstream config_file( filename.c_str() );
 	if( ! config_file.good() )
 	{
+		// FIXME: Cleanup memory and be more descriptive.
 		System::Windows::Forms::MessageBox::Show( "Couldn't load: " + gcnew System::String(filename.c_str()), "Couldn't Load Settings", System::Windows::Forms::MessageBoxButtons::OK, System::Windows::Forms::MessageBoxIcon::Error );
 		return;
 	}
@@ -71,13 +73,14 @@ void DeviceConfig::Save( void )
 	FILE *config_file = fopen( filename.c_str(), "wt" );
 	if( ! config_file )
 	{
+		// FIXME: Cleanup memory and be more descriptive.
 		System::Windows::Forms::MessageBox::Show( "Couldn't save: " + gcnew System::String(filename.c_str()), "Couldn't Save Settings", System::Windows::Forms::MessageBoxButtons::OK, System::Windows::Forms::MessageBoxIcon::Error );
 		return;
 	}
 
 	fprintf( config_file, "// Raptor007's Falcon 4 to Saitek Utility\n\n" );
 	fprintf( config_file, "min_version 2.0\n" );
-	fprintf( config_file, "version 2.0\n\n" );
+	fprintf( config_file, "version %.1f\n\n", Saitek::Version );
 	fprintf( config_file, "// %s\n", TypeString() );
 	fprintf( config_file, "device %s\n\n", GuidString().c_str() );
 
@@ -107,7 +110,20 @@ void DeviceConfig::LoadLine( char *line )
 			
 			// Execute one command.
 			if( cmd_vec.size() )
-				LoadLine( cmd_vec );
+			{
+				if( (cmd_vec[0] == "min_version") && (cmd_tokens.size() >= 2) )
+				{
+					float min_version = atof( cmd_vec[1].c_str() );
+					if( (min_version - 0.0001f) > Saitek::Version )
+					{
+						// FIXME: Cleanup memory and be more descriptive.
+						System::Windows::Forms::MessageBox::Show( "Couldn't load: " + gcnew System::String(Name.c_str()), "Couldn't Load Device Config", System::Windows::Forms::MessageBoxButtons::OK, System::Windows::Forms::MessageBoxIcon::Error );
+						break;
+					}
+				}
+				else
+					LoadLine( cmd_vec );
+			}
 		}
 	}
 	catch( ... ){}
@@ -115,10 +131,26 @@ void DeviceConfig::LoadLine( char *line )
 
 void DeviceConfig::LoadLine( std::vector<std::string> cmd_tokens )
 {
+	if( ! cmd_tokens.size() )
+		return;
+	
+	std::string cmd = cmd_tokens[ 0 ];
+	
+	if( (cmd == "bind") && (cmd_tokens.size() >= 3) )
+	{
+		KeyBinds[ cmd_tokens[1] ] = cmd_tokens[ 2 ];
+	}
 }
 
 void DeviceConfig::SaveLines( FILE *config_file )
 {
+	if( KeyBinds.size() )
+	{
+		for( std::map<std::string,std::string>::iterator bind_iter = KeyBinds.begin(); bind_iter != KeyBinds.end(); bind_iter ++ )
+			fprintf( config_file, "bind \"%s\" \"%s\"\n", bind_iter->first.c_str(), bind_iter->second.c_str() );
+		
+		fprintf( config_file, "\n" );
+	}
 }
 
 void DeviceConfig::ShowEditWindow( void )
@@ -163,6 +195,7 @@ DeviceInstance::DeviceInstance( void *saitek_device, DeviceConfig *config, GUID 
 {
 	SaitekDevice = saitek_device;
 	Config = config;
+	Buttons = 0;
 }
 
 DeviceInstance::~DeviceInstance()
@@ -171,7 +204,22 @@ DeviceInstance::~DeviceInstance()
 
 void DeviceInstance::Begin( void ){}
 void DeviceInstance::End( void ){}
-void DeviceInstance::Update( F4SharedMem::FlightData ^fd, double total_time ){}
+void DeviceInstance::Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, double total_time ){}
+
+void DeviceInstance::ChangeButtons( DWORD buttons )
+{
+	if( Buttons != buttons )
+	{
+		DWORD button = buttons ^ Buttons;
+		bool state = buttons & button;
+		
+		Buttons = buttons;
+		
+		ChangedButton( button, state );
+	}
+}
+
+void DeviceInstance::ChangedButton( DWORD button, bool state ){}
 
 void DeviceInstance::RegisterCallbacks( void )
 {

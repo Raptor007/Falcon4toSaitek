@@ -5,11 +5,15 @@ class FalconOutput;
 #include <string>
 #include <map>
 #include <tchar.h>
+#include "DrawingToolbox.h"
 
 class FalconOutput
 {
 public:
+	std::map< void*, DrawingToolbox > DrawTools;
+	
 	FalconOutput( void );
+	~FalconOutput();
 	
 	int GetTextType( std::string name );
 	int GetImageType( std::string name );
@@ -19,9 +23,10 @@ public:
 	std::string GetConditionName( int type );
 	
 	bool CheckCondition( F4SharedMem::FlightData ^fd, int type, double total_time );
-	void FormatText( F4SharedMem::FlightData ^fd, int type, double total_time, wchar_t *buffer, int size = 1024 );
-	void DrawText( F4SharedMem::FlightData ^fd, int type, double total_time, int x, int y, System::Drawing::Graphics ^gfx, System::Drawing::Font ^font, System::Drawing::Brush ^brush );
-	void DrawImage( F4SharedMem::FlightData ^fd, int type, double total_time, int x, int y, int w, int h, System::Drawing::Graphics ^gfx );
+	void FormatText( F4SharedMem::FlightData ^fd, int type, double total_time, void *device, wchar_t *buffer, int size = 1024 );
+	void DrawText( F4SharedMem::FlightData ^fd, int type, double total_time, void *device, int x, int y, System::Drawing::Graphics ^gfx, System::Drawing::Font ^font, System::Drawing::Brush ^brush );
+	void DrawImage( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, int type, double total_time, void *device, int x, int y, int w, int h, System::Drawing::Graphics ^gfx );
+	
 	void ScalePoints( cli::array<System::Drawing::PointF> ^points, float x, float y, float w, float h );
 	void UndoScalePoints( cli::array<System::Drawing::PointF> ^points, float x, float y, float w, float h );
 	
@@ -33,7 +38,7 @@ private:
 	std::map< std::string, int > Conditions;
 	std::string GetName( std::map< std::string, int > *map, int type );
 	int GetType( std::map< std::string, int > *map, std::string name );
-
+	
 	gcroot<cli::array<System::Drawing::PointF>^> FalconSilhouette;
 };
 
@@ -76,6 +81,7 @@ namespace Condition
 		GearDownAOAAbove,
 		GearDownAOABelow,
 		GearDownAOAOn,
+		OnGround,
 		
 		BadAttitude,
 
@@ -196,7 +202,10 @@ namespace TextType
 		HsiBits1,
 		HsiBits2,
 		
-		RunTime
+		RunTime,
+
+		TexW,
+		TexH
 	};
 }
 
@@ -205,7 +214,7 @@ namespace ImageType
 	enum
 	{
 		Nothing = 0,
-
+		
 		Attitude,
 		Gear,
 		Airbrake,
@@ -213,15 +222,23 @@ namespace ImageType
 		RWRSimple,
 		Throttle,
 		Warning,
-
+		
 		PitchTrim,
 		RollTrim,
 		YawTrim,
-
+		
 		ScreenCopy,
 		ScreenCenter,
 		ScreenCenterZoomed,
 		ScreenCursor,
-		ScreenCursorZoomed
+		ScreenCursorZoomed,
+		
+		Tex,
+		TexMFD1,
+		TexMFD2,
+		TexRWR,
+		TexDED,
+		TexHUD,
+		TexHMCS
 	};
 }

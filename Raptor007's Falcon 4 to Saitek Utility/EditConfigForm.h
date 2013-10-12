@@ -88,7 +88,7 @@ namespace Raptor007sFalcon4toSaitekUtility
 			// SaveButton
 			// 
 			this->SaveButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-			this->SaveButton->Location = System::Drawing::Point(332, 377);
+			this->SaveButton->Location = System::Drawing::Point(282, 377);
 			this->SaveButton->Name = L"SaveButton";
 			this->SaveButton->Size = System::Drawing::Size(90, 23);
 			this->SaveButton->TabIndex = 0;
@@ -108,14 +108,15 @@ namespace Raptor007sFalcon4toSaitekUtility
 			this->ConfigText->Multiline = true;
 			this->ConfigText->Name = L"ConfigText";
 			this->ConfigText->ScrollBars = System::Windows::Forms::ScrollBars::Both;
-			this->ConfigText->Size = System::Drawing::Size(409, 358);
+			this->ConfigText->Size = System::Drawing::Size(359, 358);
 			this->ConfigText->TabIndex = 1;
 			this->ConfigText->TextChanged += gcnew System::EventHandler(this, &EditConfigForm::ConfigText_TextChanged);
+			this->ConfigText->KeyUp += gcnew System::Windows::Forms::KeyEventHandler(this, &EditConfigForm::ConfigText_KeyUp);
 			// 
 			// CancelButton
 			// 
 			this->CancelButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-			this->CancelButton->Location = System::Drawing::Point(208, 377);
+			this->CancelButton->Location = System::Drawing::Point(158, 377);
 			this->CancelButton->Name = L"CancelButton";
 			this->CancelButton->Size = System::Drawing::Size(56, 23);
 			this->CancelButton->TabIndex = 2;
@@ -125,8 +126,9 @@ namespace Raptor007sFalcon4toSaitekUtility
 			// 
 			// ApplyButton
 			// 
+			this->ApplyButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 			this->ApplyButton->Enabled = false;
-			this->ApplyButton->Location = System::Drawing::Point(270, 377);
+			this->ApplyButton->Location = System::Drawing::Point(220, 377);
 			this->ApplyButton->Name = L"ApplyButton";
 			this->ApplyButton->Size = System::Drawing::Size(56, 23);
 			this->ApplyButton->TabIndex = 3;
@@ -138,7 +140,7 @@ namespace Raptor007sFalcon4toSaitekUtility
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(434, 412);
+			this->ClientSize = System::Drawing::Size(384, 412);
 			this->Controls->Add(this->ApplyButton);
 			this->Controls->Add(this->CancelButton);
 			this->Controls->Add(this->ConfigText);
@@ -169,6 +171,10 @@ private: System::Void ApplyButton_Click( System::Object ^sender, System::EventAr
 			std::string name( name_ptr );
 			System::Runtime::InteropServices::Marshal::FreeHGlobal( System::IntPtr( (void*) name_ptr ) );
 			
+			// Temporarily suspend all device updating while we change the config.
+			Saitek::MainThread->DoDeviceUpdates = false;
+			System::Threading::Thread::Sleep( 100 );
+			
 			// Save basic config parameters for this device type.
 			Saitek::Configs[ name ]->Clear();
 			Saitek::Configs[ name ]->Save();
@@ -193,6 +199,9 @@ private: System::Void ApplyButton_Click( System::Object ^sender, System::EventAr
 				// Reload config from file.
 				Saitek::Configs[ name ]->Load();
 				
+				// Restore device updating.
+				Saitek::MainThread->DoDeviceUpdates = true;
+				
 				ApplyButton->Enabled = false;
 			}
 			else
@@ -201,6 +210,11 @@ private: System::Void ApplyButton_Click( System::Object ^sender, System::EventAr
 private: System::Void ConfigText_TextChanged( System::Object ^sender, System::EventArgs ^e )
 		{
 			ApplyButton->Enabled = true;
+		}
+private: System::Void ConfigText_KeyUp( System::Object ^sender, System::Windows::Forms::KeyEventArgs ^e )
+		{
+			if( e->Control && e->KeyCode == Keys::A )
+				ConfigText->SelectAll();
 		}
 };
 }

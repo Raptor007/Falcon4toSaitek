@@ -4,7 +4,7 @@ class FIPBitmap
 {
 public:
 	FIPBitmap( void );
-	System::Drawing::Graphics ^GetGraphics();
+	System::Drawing::Graphics ^GetGraphics( void );
 	unsigned char *GetBuffer( void );
 
 private:

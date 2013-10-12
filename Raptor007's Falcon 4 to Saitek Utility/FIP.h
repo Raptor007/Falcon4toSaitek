@@ -9,6 +9,7 @@ class FIPText;
 #include <msclr\auto_gcroot.h>
 #include <string>
 #include <vector>
+#include <map>
 #include "Device.h"
 #include "FIPBitmap.h"
 
@@ -38,8 +39,9 @@ public:
 	void Begin( void );
 	void End( void );
 	
-	void Update( F4SharedMem::FlightData ^fd, double total_time );
+	void Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, double total_time );
 	
+	void ChangedButton( DWORD button, bool state );
 	void SetPage( int page );
 };
 
@@ -67,6 +69,7 @@ public:
 	std::string Label;
 	std::vector<FIPLayer*> Layers;
 	LED LED;
+	std::map<std::string, std::string> KeyBinds;
 	
 	FIPPage( std::string label );
 	virtual ~FIPPage();
@@ -83,7 +86,7 @@ public:
 	FIPLayer( void );
 	virtual ~FIPLayer();
 
-	virtual void Draw( F4SharedMem::FlightData ^fd, System::Drawing::Graphics ^gfx, double total_time ) = 0;
+	virtual void Draw( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, System::Drawing::Graphics ^gfx, double total_time, void *device ) = 0;
 };
 
 
@@ -95,7 +98,7 @@ public:
 	FIPImage( int type, int x, int y, int w, int h );
 	virtual ~FIPImage();
 
-	void Draw( F4SharedMem::FlightData ^fd, System::Drawing::Graphics ^gfx, double total_time );
+	void Draw( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, System::Drawing::Graphics ^gfx, double total_time, void *device );
 };
 
 
@@ -108,5 +111,5 @@ public:
 	FIPText( int type, int x, int y, System::Drawing::Font ^font, System::Drawing::Brush ^brush );
 	virtual ~FIPText();
 
-	void Draw( F4SharedMem::FlightData ^fd, System::Drawing::Graphics ^gfx, double total_time );
+	void Draw( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, System::Drawing::Graphics ^gfx, double total_time, void *device );
 };

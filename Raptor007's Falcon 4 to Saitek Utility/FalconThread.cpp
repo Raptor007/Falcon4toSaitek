@@ -9,6 +9,7 @@ FalconThread::FalconThread( void )
 	Running = false;
 	ChildThreads = 0;
 	FalconRunning = false;
+	DoDeviceUpdates = true;
 }
 
 
@@ -22,6 +23,9 @@ void FalconThread::Code( void )
 		FD = reader->GetCurrentData();
 	else
 		FD = gcnew F4SharedMem::FlightData();
+	
+	F4TexSharedMem::Reader ^tex_reader = gcnew F4TexSharedMem::Reader();
+	Tex = nullptr;
 	
 	// If we've set it to auto-launch Falcon, do so now.
 	if( Config.AutoLaunch && (Config.FalconPaths[ Config.FalconType ]->Length > 0) )
@@ -91,6 +95,12 @@ void FalconThread::Code( void )
 				{
 					// Update the flight data.
 					FD = reader->GetCurrentData();
+					
+					// Update the texture data.
+					if( tex_reader->IsDataAvailable )
+						Tex = tex_reader->FullImage;
+					
+					// Unlock when done.
 					FDLock.ReleaseLock();
 				}
 			}

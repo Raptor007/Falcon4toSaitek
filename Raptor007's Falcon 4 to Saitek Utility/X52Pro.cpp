@@ -2,11 +2,13 @@
 #include "Saitek.h"
 #include "FalconOutput.h"
 #include "X52ProConfigForm.h"
+#include "Str.h"
 #include <fstream>
 
 
 X52ProInstance::X52ProInstance( void *saitek_device, X52ProConfig *config ) : DeviceInstance( saitek_device, config, DeviceType_X52Pro )
 {
+	SelectedPage = 0;
 }
 
 X52ProInstance::~X52ProInstance()
@@ -31,7 +33,7 @@ void X52ProInstance::Begin( void )
 	for( size_t page_num = 0; page_num < page_count; page_num ++ )
 	{
 		DWORD flags = 0;
-		if( page_num == 0 )
+		if( page_num == SelectedPage )
 			flags = FLAG_SET_AS_ACTIVE;
 		Saitek::DO.AddPage( SaitekDevice, page_num, NULL, flags );
 
@@ -57,7 +59,7 @@ void X52ProInstance::End( void )
 	UnregisterCallbacks();
 }
 
-void X52ProInstance::Update( F4SharedMem::FlightData ^fd, double total_time )
+void X52ProInstance::Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, double total_time )
 {
 	if(!( SaitekDevice && Config && Saitek::Initialized ))
 		return;
@@ -79,7 +81,7 @@ void X52ProInstance::Update( F4SharedMem::FlightData ^fd, double total_time )
 			{
 				wchar_t buffer[ 32 ] = L"";
 				memset( buffer, 0, 32*sizeof(wchar_t) );
-				Saitek::Output.FormatText( fd, page->Texts[ line ], total_time, buffer, 32 );
+				Saitek::Output.FormatText( fd, page->Texts[ line ], total_time, SaitekDevice, buffer, 32 );
 				Saitek::DO.SetString( SaitekDevice, page_num, line, wcslen(buffer), buffer );
 			}
 		}
@@ -89,6 +91,122 @@ void X52ProInstance::Update( F4SharedMem::FlightData ^fd, double total_time )
 				Saitek::DO.SetString( SaitekDevice, page_num, line, wcslen(L""), L"" );
 		}
 	}
+}
+
+void X52ProInstance::ChangedButton( DWORD button, bool state )
+{
+	std::string button_name;
+	if( button == SoftButton_Select )
+		button_name = "click";
+	else if( button == SoftButton_Down )
+		button_name = "down";
+	else if( button == SoftButton_Up )
+		button_name = "up";
+	
+	// Determine the binds to search for.
+	std::vector<std::string> button_names;
+	if( button_name.length() )
+	{
+		if( state )
+		{
+			button_names.push_back( button_name );
+			button_names.push_back( std::string("+") + button_name );
+		}
+		else
+			button_names.push_back( std::string("-") + button_name );
+	}
+	
+	// Loop through all button events to see if any are bound to key events.
+	for( std::vector<std::string>::iterator name_iter = button_names.begin(); name_iter != button_names.end(); name_iter ++ )
+	{
+		std::string bind;
+		
+		// See if this button is bound for this page.
+		std::map<std::string,std::string>::iterator bind_find = ((X52ProConfig*)Config)->Pages[SelectedPage]->KeyBinds.find( *name_iter );
+		if( bind_find != ((X52ProConfig*)Config)->Pages[SelectedPage]->KeyBinds.end() )
+			bind = bind_find->second;
+		else
+		{
+			// See if this button is bound for this device.
+			std::map<std::string,std::string>::iterator bind_find = Config->KeyBinds.find( *name_iter );
+			if( bind_find != Config->KeyBinds.end() )
+				bind = bind_find->second;
+		}
+		
+		if( bind.length() )
+		{
+			// Split to a vector of strings, one per key event.
+			std::vector<std::string> binds = Str::SplitToVector( bind.c_str(), " " );
+			for( std::vector<std::string>::iterator bind_iter = binds.begin(); bind_iter != binds.end(); bind_iter ++ )
+			{
+				// Determine if this is a hold/release event or a quick press.
+				char bind_prefix = (*bind_iter)[ 0 ];
+				if( (bind_prefix != '+') && (bind_prefix != '-') )
+					bind_prefix = 0;
+				
+				// Get the keyname.
+				std::string bind = (bind_prefix ? (*bind_iter).substr(1) : *bind_iter);
+				
+				// Determine the key's scancode.
+				WORD scancode = 0;
+				if( bind[ 0 ] == '#' )
+				{
+					// Use raw numeric value as scancode.
+					scancode = atoi( bind.substr(1).c_str() );
+				}
+				else
+				{
+					// Look up the scancode in the keymap.
+					std::map<std::string,WORD>::iterator key_find = Saitek::KeyMap.find(bind);
+					if( key_find != Saitek::KeyMap.end() )
+						scancode = key_find->second;
+				}
+				
+				// If we have a valid scancode, send the key events.
+				if( scancode )
+				{
+					// This structure will be used to create the keyboard input event.
+					INPUT ip;
+					
+					// Set up a generic keyboard event.
+					ip.type = INPUT_KEYBOARD;
+					ip.ki.wVk = 0;
+					ip.ki.wScan = 0;
+					ip.ki.time = 0;
+					ip.ki.dwExtraInfo = 0;
+					
+					// Get the scancode.
+					ip.ki.wScan = scancode;
+					
+					if( bind_prefix != '-' )
+					{
+						// Press the key.
+						ip.ki.dwFlags = KEYEVENTF_SCANCODE;
+						SendInput( 1, &ip, sizeof(INPUT) );
+					}
+					
+					if( bind_prefix != '+' )
+					{
+						// Release the key.
+						ip.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+						SendInput( 1, &ip, sizeof(INPUT) );
+					}
+				}
+			}
+		}
+	}
+}
+
+void X52ProInstance::RegisterCallbacks( void )
+{
+	DeviceInstance::RegisterCallbacks();
+	Saitek::DO.RegisterPageCallback( SaitekDevice, &(Saitek::PageChange), this );
+}
+
+void X52ProInstance::UnregisterCallbacks( void )
+{
+	DeviceInstance::UnregisterCallbacks();
+	Saitek::DO.RegisterPageCallback( SaitekDevice, NULL, this );
 }
 
 
@@ -139,6 +257,8 @@ void X52ProConfig::Initialize( void )
 
 void X52ProConfig::Clear( void )
 {
+	DeviceConfig::Clear();
+	
 	SleepMs = 100;
 	
 	LEDs[ X52ProLEDNum::Fire ].DefaultLook.Color = LEDColor::On;
@@ -176,6 +296,8 @@ void X52ProConfig::Clear( void )
 
 void X52ProConfig::LoadLine( std::vector<std::string> cmd_tokens )
 {
+	DeviceConfig::LoadLine( cmd_tokens );
+	
 	if( ! cmd_tokens.size() )
 		return;
 	
@@ -236,19 +358,28 @@ void X52ProConfig::LoadLine( std::vector<std::string> cmd_tokens )
 	else if( (cmd == "mfd") && (cmd_tokens.size() >= 4) )
 	{
 		int page = atoi( cmd_tokens[ 1 ].c_str() ) - 1;
-		int line = atoi( cmd_tokens[ 2 ].c_str() ) - 1;
-		int text = Saitek::Output.GetTextType( cmd_tokens[ 3 ] );
 		
 		while( (int) Pages.size() <= page )
 			Pages.push_back( new X52ProPage() );
 		
-		Pages[ page ]->Texts[ line ] = text;
+		if( (cmd_tokens[ 2 ] == "bind") && (cmd_tokens.size() >= 5) )
+			Pages[ page ]->KeyBinds[ cmd_tokens[3] ] = cmd_tokens[ 4 ];
+		else
+		{
+			int line = atoi( cmd_tokens[ 2 ].c_str() ) - 1;
+			int text = Saitek::Output.GetTextType( cmd_tokens[ 3 ] );
+			
+			Pages[ page ]->Texts[ line ] = text;
+		}
 	}
 }
 
 
 void X52ProConfig::SaveLines( FILE *config_file )
 {
+	DeviceConfig::SaveLines( config_file );
+	
+	
 	// Save LEDs.
 	
 	for( int i = 0; i < X52ProLEDNum::NUM; i ++ )
@@ -360,6 +491,9 @@ void X52ProConfig::SaveLines( FILE *config_file )
 			
 			fprintf( config_file, "mfd %i %i %s\n", i + 1, j + 1, text.c_str() );
 		}
+		
+		for( std::map<std::string,std::string>::iterator bind_iter = Pages[ i ]->KeyBinds.begin(); bind_iter != Pages[ i ]->KeyBinds.end(); bind_iter ++ )
+			fprintf( config_file, "mfd %i bind \"%s\" \"%s\"\n", i + 1, bind_iter->first.c_str(), bind_iter->second.c_str() );
 		
 		fprintf( config_file, "\n" );
 	}
