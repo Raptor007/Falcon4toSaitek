@@ -239,6 +239,8 @@ namespace ImageType
 		TexRWR,
 		TexDED,
 		TexHUD,
-		TexHMCS
+		TexHMCS,
+
+		GaugeAzimuth
 	};
 }

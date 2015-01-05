@@ -1,17 +1,15 @@
-=====================================================
-|      Raptor007's Falcon 4 to Saitek Utility       |
-|             Version 2.1 (2013-10-12)              |
-|                                                   |
-|             http://www.raptor007.com/             |
-| http://www.saitekforum.com/showthread.php?t=16028 |
-|                 blair@datapro.net                 |
-=====================================================
+============================================
+|  Raptor007's Falcon 4 to Saitek Utility  |
+|         Version 2.2 (2015-01-04)         |
+|                                          |
+|         http://www.raptor007.com/        |
+|             blair@datapro.net            |
+============================================
 
 
-This program was written by Raptor007 (Blair Sherman).  Email me or find my
-thread on saitekforums.com if you find a bug or if you think of something else
-you'd like this utility to do.  I already have some plans for additional
-features, so keep watching for updated versions.
+This program was written by Raptor007 (Blair Sherman).  Email me if you find a
+bug or if you think of something else you'd like this utility to do.  I already
+have some plans for additional features, so keep watching for updated versions.
 
 This program would be nothing without the F4SharedMemory library, by Lightning
 of viperpits.org.  Thanks for the excellent work!
@@ -23,14 +21,9 @@ direction.
 INSTALLATION
 ------------
 First you'll need to install some Saitek drivers that give you DirectOutput 6.6
-or newer.  Saitek currently has some bugs in their 7.0.27.13 X52 Pro drivers,
-so you may want to use the 6.6.1.40 FIP drivers instead (even if you don't have
-a FIP) as they seem to be the best driver release so far.  You CANNOT use the
-old 6.2.2.4 X52 Pro drivers with this utility!
-
-It can be harder than you'd think to get Saitek's drivers working properly.
-See the install instructions on my website if you're having difficulties:
-  http://www.raptor007.com/falcon-4-to-saitek/
+or newer.  At this time, I recommend the latest 7.0.34.109 drivers for all your
+Saitek devices (X52 Pro and FIP):
+  ftp://ftp.saitek.com/pub/software/full/
 
 You might also need to install the Microsoft Visual C++ 2008 runtime:
   http://www.microsoft.com/downloads/en/details.aspx?FamilyID=9b2da534-3e03-4391-8a4d-074b9f2bc1bf
@@ -498,13 +491,12 @@ but many of them do not behave as I'd expect.  Your mileage may vary.
 
 TROUBLESHOOTING
 ---------------
-If your device list is missing items, you probably have the wrong drivers
-installed.  This utility requires DirectOutput 6.6 or later, which is included
-with the FIP SD6 drivers (this should work for the X52 Pro too).  Scroll up to
-the "INSTALLATION" section of this readme for more information.
+If your device list is missing items, you're probably missing some drivers.
+Uninstall all existing copies of Saitek DirectOutput, then install the latest
+Saitek drivers for your hardware.
 
-If you're sure you've properly installed DirectOutput 6.6+ and your device
-still isn't showing up, try moving it to a different USB port.
+If you're sure you've properly installed all drivers and your device still
+isn't showing up, try moving it to a different USB port.
 
 If you get no lights or MFD activity after clicking Start and opening Falcon 4,
 you may need to restart the Saitek DirectOutput service.  To do this, click the
@@ -514,6 +506,22 @@ work properly the next time you click Start.
 If Falcon 4 freezes when you launch it, hit Stop, check the "Wait for Falcon"
 box, then hit Start and try again.
 
+If the X52 Pro MFD starts out dim, simply roll the left wheel (page select) up,
+then back down.  This seems to be caused by a bug in Saitek's 7.x.x.x drivers.
+
+If you alt-tab out of Falcon 4, it will probably stop updating the shared
+textures (this is definitely true in BMS4).  You will have to quit and re-open
+Falcon 4 to fix the shared textures.
+
+
+CHANGES: v2.2 (2015-01-04)
+--------------------------
+* Shared textures on FIP shouldn't go black or hang anymore.
+* Reduced X52 Pro MFD glitches by no longer sending data that is the same as
+  what is currently being displayed.
+* Fixed some potential crashes, especially when using lots of devices.
+* Combined BMS3 / OpenFalcon into one option because they use the same format.
+* Tweaked default configurations to better match what I use while flying.
 
 CHANGES: v2.1 (2013-10-12)
 --------------------------

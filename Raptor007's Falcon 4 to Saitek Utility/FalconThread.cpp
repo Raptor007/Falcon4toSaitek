@@ -76,7 +76,19 @@ void FalconThread::Code( void )
 			System::Threading::ThreadStart ^thread_start = gcnew System::Threading::ThreadStart( device_thread, &(DeviceThread::Code) );
 			System::Threading::Thread ^thread = gcnew System::Threading::Thread( thread_start );
 			thread->Start();
-			//thread->Priority = System::Threading::ThreadPriority::AboveNormal;
+			
+			/*
+			if( Config.DeviceThreadPriority >= 2 )
+				thread->Priority = System::Threading::ThreadPriority::Highest;
+			else if( Config.DeviceThreadPriority == 1 )
+				thread->Priority = System::Threading::ThreadPriority::AboveNormal;
+			else if( Config.DeviceThreadPriority == 0 )
+				thread->Priority = System::Threading::ThreadPriority::Normal;
+			else if( Config.DeviceThreadPriority == -1 )
+				thread->Priority = System::Threading::ThreadPriority::BelowNormal;
+			else if( Config.DeviceThreadPriority <= -2 )
+				thread->Priority = System::Threading::ThreadPriority::Lowest;
+			*/
 		}
 	}
 	
@@ -86,28 +98,15 @@ void FalconThread::Code( void )
 		// Ask the reader if Falcon is running, and store it so the child threads will know.
 		if( FalconRunning = reader->IsFalconRunning )
 		{
-			// We need try/catch in case AcquireWriterLock fails.
-			try
-			{
-				// Make sure none of the device threads are currently using flight data.
-				FDLock.AcquireWriterLock( 1000 );
-				if( FDLock.IsWriterLockHeld )
-				{
-					// Update the flight data.
-					FD = reader->GetCurrentData();
-					
-					// Update the texture data.
-					if( tex_reader->IsDataAvailable )
-						Tex = tex_reader->FullImage;
-					
-					// Unlock when done.
-					FDLock.ReleaseLock();
-				}
-			}
-			catch( ... ){}
+			// Update the shared flight data.
+			FD = reader->GetCurrentData();
+			
+			// Update the shared texture data.
+			if( tex_reader->IsDataAvailable )
+				Tex = tex_reader->FullImage;
 			
 			// Sleep a little if Falcon is running.
-			System::Threading::Thread::Sleep( 100 );
+			System::Threading::Thread::Sleep( 33 );
 		}
 		else
 			// Sleep a lot if Falcon is not running.

@@ -9,6 +9,7 @@ DrawingToolbox::DrawingToolbox( void )
 {
 	Brushes = gcnew System::Collections::Generic::Dictionary< System::Drawing::Color, System::Drawing::Brush^ >();
 	Pens = gcnew System::Collections::Generic::Dictionary< System::Drawing::Color, System::Drawing::Pen^ >();
+	Fonts = gcnew System::Collections::Generic::Dictionary< int, System::Drawing::Font^ >();
 	
 	Horizon = gcnew System::Drawing::Bitmap( 16, 3, System::Drawing::Imaging::PixelFormat::Format16bppRgb565 );
 	HorizonGfx = System::Drawing::Graphics::FromImage( Horizon );
@@ -20,6 +21,7 @@ DrawingToolbox::DrawingToolbox( const DrawingToolbox &other )
 {
 	Brushes = gcnew System::Collections::Generic::Dictionary< System::Drawing::Color, System::Drawing::Brush^ >();
 	Pens = gcnew System::Collections::Generic::Dictionary< System::Drawing::Color, System::Drawing::Pen^ >();
+	Fonts = gcnew System::Collections::Generic::Dictionary< int, System::Drawing::Font^ >();
 	
 	Horizon = gcnew System::Drawing::Bitmap( 16, 3, System::Drawing::Imaging::PixelFormat::Format16bppRgb565 );
 	HorizonGfx = System::Drawing::Graphics::FromImage( Horizon );
@@ -49,6 +51,16 @@ System::Drawing::Pen ^DrawingToolbox::GetPen( System::Drawing::Color color )
 	return Pens.get()[ color ];
 }
 
+System::Drawing::Font ^DrawingToolbox::GetFont( System::Drawing::FontFamily ^family, int size, System::Drawing::FontStyle style )
+{
+	int font_id = GetFontID( family, size, style );
+	
+	if( ! Fonts->ContainsKey(font_id) )
+		Fonts->Add( font_id, gcnew System::Drawing::Font( family, (float) size, style, System::Drawing::GraphicsUnit::Pixel ) );
+	
+	return Fonts.get()[ font_id ];
+}
+
 
 void DrawingToolbox::UpdateHorizon( F4SharedMem::FlightData ^fd )
 {
@@ -74,4 +86,24 @@ void DrawingToolbox::UpdateHorizon( F4SharedMem::FlightData ^fd )
 	HorizonGfx->Clear( horizonEmpty );
 	HorizonGfx->FillPolygon( horizonBrush, HorizonPoints, System::Drawing::Drawing2D::FillMode::Alternate );
 	HorizonGfx->DrawLine( horizonPen, HorizonPoints[ 0 ].X, HorizonPoints[ 0 ].Y, HorizonPoints[ 1 ].X , HorizonPoints[ 1 ].Y );
+}
+
+
+int DrawingToolbox::GetFontID( System::Drawing::FontFamily ^family, int size, System::Drawing::FontStyle style )
+{
+	int hash = size * 16;
+	
+	if( family != System::Drawing::FontFamily::GenericMonospace )
+		hash += 8;
+	
+	if( style == System::Drawing::FontStyle::Bold )
+		hash += 1;
+	else if( style == System::Drawing::FontStyle::Italic )
+		hash += 2;
+	else if( style == System::Drawing::FontStyle::Underline )
+		hash += 3;
+	else if( style == System::Drawing::FontStyle::Strikeout )
+		hash += 4;
+	
+	return hash;
 }

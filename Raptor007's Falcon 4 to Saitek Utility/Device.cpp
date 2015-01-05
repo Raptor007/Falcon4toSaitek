@@ -191,10 +191,17 @@ void DeviceConfig::ShowEditWindow( void )
 }
 
 
+bool DeviceConfig::NeedsTex( void )
+{
+	return false;
+}
+
+
 DeviceInstance::DeviceInstance( void *saitek_device, DeviceConfig *config, GUID guid ) : Device( guid )
 {
 	SaitekDevice = saitek_device;
 	Config = config;
+	SelectedPage = 0;
 	Buttons = 0;
 }
 
@@ -205,6 +212,15 @@ DeviceInstance::~DeviceInstance()
 void DeviceInstance::Begin( void ){}
 void DeviceInstance::End( void ){}
 void DeviceInstance::Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, double total_time ){}
+
+void DeviceInstance::SetLED( int page_num, int led, bool value, bool force )
+{
+	if( force || ((page_num == SelectedPage) && (value != LEDState[ page_num ][ led ])) )
+	{
+		Saitek::DO.SetLed( SaitekDevice, page_num, led, value );
+		LEDState[ page_num ][ led ] = value;
+	}
+}
 
 void DeviceInstance::ChangeButtons( DWORD buttons )
 {
@@ -269,7 +285,7 @@ void LED::SetIndices( int index_r, int index_g )
 	IndexG = index_g;
 }
 
-void LED::ApplyLook( F4SharedMem::FlightData ^fd, double total_time, void *device, int page_num )
+void LED::ApplyLook( F4SharedMem::FlightData ^fd, double total_time, DeviceInstance *instance, int page_num, bool force_update )
 {
 	LEDLook *look = &(DefaultLook);
 
@@ -282,10 +298,10 @@ void LED::ApplyLook( F4SharedMem::FlightData ^fd, double total_time, void *devic
 		}
 	}
 
-	ApplyLook( look, total_time, device, page_num );
+	ApplyLook( look, total_time, instance, page_num, force_update );
 }
 
-void LED::ApplyLook( LEDLook *look, double total_time, void *device, int page_num )
+void LED::ApplyLook( LEDLook *look, double total_time, DeviceInstance *instance, int page_num, bool force_update )
 {
 	double blink_wait = look->BlinkRate ? (1. / look->BlinkRate) : 0.;
 	
@@ -295,7 +311,7 @@ void LED::ApplyLook( LEDLook *look, double total_time, void *device, int page_nu
 		if( active && blink_wait && (fmod( total_time, blink_wait * 2. ) < blink_wait) )
 			active = false;
 
-		Saitek::DO.SetLed( device, page_num, IndexR, active );
+		instance->SetLED( page_num, IndexR, active, force_update );
 	}
 
 	if( IndexG >= 0 )
@@ -304,6 +320,6 @@ void LED::ApplyLook( LEDLook *look, double total_time, void *device, int page_nu
 		if( active && blink_wait && (fmod( total_time, blink_wait * 2. ) < blink_wait) )
 			active = false;
 
-		Saitek::DO.SetLed( device, page_num, IndexG, active );
+		instance->SetLED( page_num, IndexG, active, force_update );
 	}
 }

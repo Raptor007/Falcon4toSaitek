@@ -29,7 +29,6 @@ class FIPInstance : public DeviceInstance
 {
 public:
 	FIPBitmap Bmp;
-	int SelectedPage;
 	
 	FIPInstance( void *saitek_device, FIPConfig *config );
 	virtual ~FIPInstance();
@@ -60,6 +59,8 @@ public:
 	void LoadLine( std::vector<std::string> cmd_tokens );
 	void SaveLines( FILE *config_file );
 	//void ShowEditWindow( Raptor007sFalcon4toSaitekUtility::MainForm ^main_form );
+	
+	bool NeedsTex( void );
 };
 
 
@@ -108,7 +109,7 @@ public:
 	msclr::auto_gcroot<System::Drawing::Font^> TextFont;
 	msclr::auto_gcroot<System::Drawing::Brush^> TextBrush;
 
-	FIPText( int type, int x, int y, System::Drawing::Font ^font, System::Drawing::Brush ^brush );
+	FIPText( int type, int x, int y );
 	virtual ~FIPText();
 
 	void Draw( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, System::Drawing::Graphics ^gfx, double total_time, void *device );

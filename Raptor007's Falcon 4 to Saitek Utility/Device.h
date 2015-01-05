@@ -9,6 +9,7 @@ class LED;
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include "DirectOutputImpl.h"
 
 namespace Raptor007sFalcon4toSaitekUtility
@@ -46,8 +47,10 @@ public:
 	void LoadLine( char *line );
 	virtual void LoadLine( std::vector<std::string> cmd_tokens );
 	virtual void SaveLines( FILE *config_file );
-
+	
 	virtual void ShowEditWindow( void );
+	
+	virtual bool NeedsTex( void );
 };
 
 
@@ -56,7 +59,10 @@ class DeviceInstance : public Device
 public:
 	void *SaitekDevice;
 	DeviceConfig *Config;
+	int SelectedPage;
 	DWORD Buttons;
+	std::map< int, std::map<int,bool> > LEDState;
+	std::set<int> PagesNeedRefresh;
 	
 	DeviceInstance( void *saitek_device, DeviceConfig *config, GUID guid );
 	virtual ~DeviceInstance();
@@ -65,6 +71,7 @@ public:
 	virtual void End( void );
 	
 	virtual void Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, double dt );
+	virtual void SetLED( int page_num, int led, bool value, bool force = false );
 	
 	void ChangeButtons( DWORD buttons );
 	virtual void ChangedButton( DWORD button, bool state );
@@ -105,8 +112,8 @@ public:
 	virtual ~LED();
 
 	void SetIndices( int index_r, int index_g );
-	void ApplyLook( F4SharedMem::FlightData ^fd, double total_time, void *device, int page_num );
-	void ApplyLook( LEDLook *look, double total_time, void *device, int page_num );
+	void ApplyLook( F4SharedMem::FlightData ^fd, double total_time, DeviceInstance *instance, int page_num, bool force_update = false );
+	void ApplyLook( LEDLook *look, double total_time, DeviceInstance *instance, int page_num, bool force_update = false );
 };
 
 namespace LEDColor

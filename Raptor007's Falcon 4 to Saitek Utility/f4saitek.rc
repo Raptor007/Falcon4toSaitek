@@ -11,8 +11,8 @@ LANGUAGE 9, 1
 
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1,0,0 // Version
- PRODUCTVERSION 2,1,0,0 // Version
+ FILEVERSION 2,2,0,0 // Version
+ PRODUCTVERSION 2,2,0,0 // Version
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -29,13 +29,13 @@ BEGIN
         BEGIN
             VALUE "Comments", "raptor007.com/falcon-4-to-saitek"
             VALUE "CompanyName", "Raptor007 (Blair Sherman)"
-            VALUE "FileDescription", "Raptor007's Falcon 4 to Saitek Utility 2.1" // Version
-            VALUE "FileVersion", "2, 1, 0, 0" // Version
+            VALUE "FileDescription", "Raptor007's Falcon 4 to Saitek Utility 2.2" // Version
+            VALUE "FileVersion", "2, 2, 0, 0" // Version
             VALUE "InternalName", "Raptor007's Falcon 4 to Saitek Utility"
-            VALUE "LegalCopyright", "2008-2013 Raptor007 (Blair Sherman)"
+            VALUE "LegalCopyright", "2008-2015 Raptor007 (Blair Sherman)"
             VALUE "OriginalFilename", "Raptor007's Falcon 4 to Saitek Utility.exe"
             VALUE "ProductName", "Raptor007's Falcon 4 to Saitek Utility"
-            VALUE "ProductVersion", "2, 1, 0, 0" // Version
+            VALUE "ProductVersion", "2, 2, 0, 0" // Version
         END
     END
 	BLOCK "VarFileInfo"

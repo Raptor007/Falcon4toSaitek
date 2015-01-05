@@ -6,7 +6,7 @@
 	ProjectGUID="{DA4AC1A7-00C5-41B8-8F5B-DA80BC7F55AE}"
 	RootNamespace="Raptor007sFalcon4toSaitekUtility"
 	Keyword="ManagedCProj"
-	TargetFrameworkVersion="196608"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform

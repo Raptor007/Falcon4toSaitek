@@ -163,6 +163,7 @@ FalconOutput::FalconOutput( void )
 	ImageTypes[ "tex_ded" ] = ImageType::TexDED;
 	ImageTypes[ "tex_hud" ] = ImageType::TexHUD;
 	ImageTypes[ "tex_hmcs" ] = ImageType::TexHMCS;
+	ImageTypes[ "gauge_azimuth" ] = ImageType::GaugeAzimuth;
 	
 	FalconSilhouette = gcnew cli::array<System::Drawing::PointF>( 15 );
 	FalconSilhouette[  0 ].X =  0.00f;
@@ -980,9 +981,16 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, System::Drawing::Bitm
 		case ImageType::RWRSimple:
 		{
 			// Draw our plane's silhouette.
-			ScalePoints( FalconSilhouette, x + w/4.f, y + h/4.f, w/2.f, h/2.f );
-			gfx->FillPolygon( green_brush, FalconSilhouette );
-			UndoScalePoints( FalconSilhouette, x + w/4.f, y + h/4.f, w/2.f, h/2.f );
+			cli::array<System::Drawing::PointF> ^silhouette = gcnew cli::array<System::Drawing::PointF>( FalconSilhouette->Length );
+			for( int i = 0; i < FalconSilhouette->Length; i ++ )
+			{
+				silhouette[ i ].X = FalconSilhouette[ i ].X;
+				silhouette[ i ].Y = FalconSilhouette[ i ].Y;
+			}
+			ScalePoints( silhouette, x + w/4.f, y + h/4.f, w/2.f, h/2.f );
+			gfx->FillPolygon( green_brush, silhouette );
+			UndoScalePoints( silhouette, x + w/4.f, y + h/4.f, w/2.f, h/2.f );
+			delete silhouette;
 
 			gfx->DrawEllipse( green_pen, x, y, w, h );
 
@@ -1226,6 +1234,23 @@ void FalconOutput::DrawImage( F4SharedMem::FlightData ^fd, System::Drawing::Bitm
 				System::Drawing::Bitmap ^region = tex->Clone( System::Drawing::Rectangle(0,630,570,570), System::Drawing::Imaging::PixelFormat::Format32bppArgb );
 				gfx->DrawImage( region, x, y, w, h );
 				delete region;
+			}
+			catch( ... ){}
+		}
+		break;
+		
+		// FIXME
+		case ImageType::GaugeAzimuth:
+		{
+			try
+			{
+				/*
+				LightningGauges::Renderers::F16AzimuthIndicator ^gauge = gcnew LightningGauges::Renderers::F16AzimuthIndicator();
+				gauge->InstrumentState->MagneticHeadingDegrees = fd->headingState;
+				gauge->InstrumentState->RollDegrees = fd->roll;
+				gauge->Render( gfx, System::Drawing::Rectangle(x,y,w,h) );
+				delete gauge;
+				*/
 			}
 			catch( ... ){}
 		}

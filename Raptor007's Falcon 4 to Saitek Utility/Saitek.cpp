@@ -11,7 +11,7 @@
 
 namespace Saitek
 {
-	float Version = 2.1f;
+	float Version = 2.2f;
 	
 	FalconOutput Output;
 	
@@ -189,7 +189,7 @@ void Saitek::GenerateDefaults( void )
 {
 	{
 		X52ProConfig *config = new X52ProConfig();
-		config->Name = "Falcon 4 Joystick";
+		config->Name = "Falcon X52 Pro";
 		Saitek::Configs[ config->Name ] = config;
 		
 		config->KeyBinds[ "up" ] = "+alt p -alt";
@@ -247,25 +247,37 @@ void Saitek::GenerateDefaults( void )
 		config->Pages.push_back( rpm_page );
 		rpm_page->Texts[ 0 ] = TextType::RPM;
 		rpm_page->Texts[ 1 ] = TextType::Nozzle;
-		rpm_page->Texts[ 2 ] = TextType::FuelTime;
+		rpm_page->Texts[ 2 ] = TextType::FuelDist;
+		
+		X52ProPage *fuel_page = new X52ProPage();
+		config->Pages.push_back( fuel_page );
+		fuel_page->Texts[ 0 ] = TextType::FuelInternal;
+		fuel_page->Texts[ 1 ] = TextType::FuelExternal;
+		fuel_page->Texts[ 2 ] = TextType::FuelTotal;
+		
+		X52ProPage *evade_page = new X52ProPage();
+		config->Pages.push_back( evade_page );
+		evade_page->Texts[ 0 ] = TextType::FuelTime;
+		evade_page->Texts[ 1 ] = TextType::Chaff;
+		evade_page->Texts[ 2 ] = TextType::Flares;
+		
+		X52ProPage *trim_page = new X52ProPage();
+		config->Pages.push_back( trim_page );
+		trim_page->Texts[ 0 ] = TextType::PitchTrim;
+		trim_page->Texts[ 1 ] = TextType::YawTrim;
+		trim_page->Texts[ 2 ] = TextType::RollTrim;
+		
+		X52ProPage *air_page = new X52ProPage();
+		config->Pages.push_back( air_page );
+		air_page->Texts[ 0 ] = TextType::IndicatedKnots;
+		air_page->Texts[ 1 ] = TextType::Altitude;
+		air_page->Texts[ 2 ] = TextType::Gear;
 		
 		X52ProPage *heading_page = new X52ProPage();
 		config->Pages.push_back( heading_page );
 		heading_page->Texts[ 0 ] = TextType::Heading;
 		heading_page->Texts[ 1 ] = TextType::Steerpoint;
 		heading_page->Texts[ 2 ] = TextType::RWRHeading;
-		
-		X52ProPage *air_page = new X52ProPage();
-		config->Pages.push_back( air_page );
-		air_page->Texts[ 0 ] = TextType::IndicatedKnots;
-		air_page->Texts[ 1 ] = TextType::GForces;
-		air_page->Texts[ 2 ] = TextType::Altitude;
-		
-		X52ProPage *supply_page = new X52ProPage();
-		config->Pages.push_back( supply_page );
-		supply_page->Texts[ 0 ] = TextType::FuelExternal;
-		supply_page->Texts[ 1 ] = TextType::Chaff;
-		supply_page->Texts[ 2 ] = TextType::Flares;
 		
 		X52ProPage *ded_page = new X52ProPage();
 		config->Pages.push_back( ded_page );
@@ -278,17 +290,11 @@ void Saitek::GenerateDefaults( void )
 		horizon_page->Texts[ 0 ] = TextType::Horizon1;
 		horizon_page->Texts[ 1 ] = TextType::Horizon2;
 		horizon_page->Texts[ 2 ] = TextType::Horizon3;
-		
-		X52ProPage *trim_page = new X52ProPage();
-		config->Pages.push_back( trim_page );
-		trim_page->Texts[ 0 ] = TextType::PitchTrim;
-		trim_page->Texts[ 1 ] = TextType::YawTrim;
-		trim_page->Texts[ 2 ] = TextType::RollTrim;
 	}
 
 	{
 		FIPConfig *config = new FIPConfig();
-		config->Name = "Falcon 4 FIP";
+		config->Name = "Falcon General-Purpose FIP";
 		Saitek::Configs[ config->Name ] = config;
 		
 		config->KeyBinds[ "left_minus" ] = "+shift z -shift";
@@ -308,10 +314,8 @@ void Saitek::GenerateDefaults( void )
 		status_page->Layers.push_back( new FIPImage( ImageType::RollTrim, 240, 10, 70, 35 ) );
 		status_page->Layers.push_back( new FIPImage( ImageType::YawTrim, 240, 50, 70, 35 ) );
 		status_page->Layers.push_back( new FIPImage( ImageType::Throttle, 210, 100, 100, 130 ) );
-		System::Drawing::Font ^status_font = gcnew System::Drawing::Font( System::Drawing::FontFamily::GenericMonospace, 12.f, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Pixel );
-		System::Drawing::Brush ^white_brush = gcnew System::Drawing::SolidBrush( System::Drawing::Color::White );
-		status_page->Layers.push_back( new FIPText( TextType::Nozzle, 212, 102, status_font, white_brush ) );
-		status_page->Layers.push_back( new FIPText( TextType::RPM, 212, 167, status_font, white_brush ) );
+		status_page->Layers.push_back( new FIPText( TextType::Nozzle, 212, 102 ) );
+		status_page->Layers.push_back( new FIPText( TextType::RPM, 212, 167 ) );
 		
 		FIPPage *attitude_page = new FIPPage( "Attitude" );
 		config->Pages.push_back( attitude_page );
@@ -352,12 +356,33 @@ void Saitek::GenerateDefaults( void )
 	
 	{
 		FIPConfig *config = new FIPConfig();
-		config->Name = "MFD Extractor Left";
+		config->Name = "Falcon MFD";
+		Saitek::Configs[ config->Name ] = config;
+		
+		config->KeyBinds[ "left_minus" ] = "+shift z -shift";
+		config->KeyBinds[ "left_plus" ] = "+shift x -shift";
+		config->KeyBinds[ "right_minus" ] = "+ctrl m -ctrl";
+		config->KeyBinds[ "right_plus" ] = "+shift m -shift";
+		
+		FIPPage *mfd1_page = new FIPPage( "" );
+		config->Pages.push_back( mfd1_page );
+		mfd1_page->LED.DefaultLook.Color = LEDColor::Off;
+		mfd1_page->Layers.push_back( new FIPImage( ImageType::TexMFD1, 20, 0, 240, 240 ) );
+		
+		FIPPage *mfd2_page = new FIPPage( "" );
+		config->Pages.push_back( mfd2_page );
+		mfd2_page->LED.DefaultLook.Color = LEDColor::Off;
+		mfd2_page->Layers.push_back( new FIPImage( ImageType::TexMFD2, 20, 0, 240, 240 ) );
+	}
+	
+	/*
+	{
+		FIPConfig *config = new FIPConfig();
+		config->Name = "Falcon MFD Control Left";
 		Saitek::Configs[ config->Name ] = config;
 		
 		FIPPage *mfd_page = new FIPPage( "" );
 		config->Pages.push_back( mfd_page );
-		mfd_page->LED.DefaultLook.Color = LEDColor::Off;
 		mfd_page->Layers.push_back( new FIPImage( ImageType::TexMFD1, 20, 0, 240, 240 ) );
 		mfd_page->KeyBinds[ "s1" ] = "+ctrl +alt num_0 -alt -ctrl";
 		mfd_page->KeyBinds[ "s2" ] = "+ctrl +alt num_9 -alt -ctrl";
@@ -369,16 +394,22 @@ void Saitek::GenerateDefaults( void )
 		mfd_page->KeyBinds[ "left_plus" ] = "+ctrl +alt num_3 -alt -ctrl";
 		mfd_page->KeyBinds[ "right_minus" ] = "+ctrl +alt num_2 -alt -ctrl";
 		mfd_page->KeyBinds[ "right_plus" ] = "+ctrl +alt num_1 -alt -ctrl";
+		
+		// Add 5 unused pages so all LEDs light up.
+		config->Pages.push_back( new FIPPage( "" ) );
+		config->Pages.push_back( new FIPPage( "" ) );
+		config->Pages.push_back( new FIPPage( "" ) );
+		config->Pages.push_back( new FIPPage( "" ) );
+		config->Pages.push_back( new FIPPage( "" ) );
 	}
 	
 	{
 		FIPConfig *config = new FIPConfig();
-		config->Name = "MFD Extractor Right";
+		config->Name = "Falcon MFD Control Right";
 		Saitek::Configs[ config->Name ] = config;
 		
 		FIPPage *mfd_page = new FIPPage( "" );
 		config->Pages.push_back( mfd_page );
-		mfd_page->LED.DefaultLook.Color = LEDColor::Off;
 		mfd_page->Layers.push_back( new FIPImage( ImageType::TexMFD2, 20, 0, 240, 240 ) );
 		mfd_page->KeyBinds[ "s1" ] = "+shift +alt num_0 -alt -shift";
 		mfd_page->KeyBinds[ "s2" ] = "+shift +alt num_9 -alt -shift";
@@ -390,11 +421,19 @@ void Saitek::GenerateDefaults( void )
 		mfd_page->KeyBinds[ "left_plus" ] = "+shift +alt num_3 -alt -shift";
 		mfd_page->KeyBinds[ "right_minus" ] = "+shift +alt num_2 -alt -shift";
 		mfd_page->KeyBinds[ "right_plus" ] = "+shift +alt num_1 -alt -shift";
+		
+		// Add 5 unused pages so all LEDs light up.
+		config->Pages.push_back( new FIPPage( "" ) );
+		config->Pages.push_back( new FIPPage( "" ) );
+		config->Pages.push_back( new FIPPage( "" ) );
+		config->Pages.push_back( new FIPPage( "" ) );
+		config->Pages.push_back( new FIPPage( "" ) );
 	}
+	*/
 	
 	{
 		FIPConfig *config = new FIPConfig();
-		config->Name = "Screen FIP";
+		config->Name = "Screen Viewer";
 		Saitek::Configs[ config->Name ] = config;
 		
 		FIPPage *screen_page = new FIPPage( "" );
@@ -618,8 +657,9 @@ void __stdcall Saitek::DeviceChange( void *device, bool added, void *ctxt )
 void __stdcall Saitek::PageChange( void *device, DWORD page_num, bool active, void *instance_ptr )
 {
 	DeviceInstance *instance = (DeviceInstance*) instance_ptr;
-	if( active && (instance->Guid == DeviceType_X52Pro) )
-		((X52ProInstance*)instance)->SelectedPage = page_num;
+	instance->PagesNeedRefresh.insert( page_num );
+	if( active )
+		instance->SelectedPage = page_num;
 }
 
 void __stdcall Saitek::SoftButtonChange( void *device, DWORD buttons, void *instance_ptr )

@@ -9,7 +9,6 @@
 
 FIPInstance::FIPInstance( void *saitek_device, FIPConfig *config ) : DeviceInstance( saitek_device, config, DeviceType_Fip )
 {
-	SelectedPage = 0;
 }
 
 FIPInstance::~FIPInstance()
@@ -26,16 +25,17 @@ void FIPInstance::Begin( void )
 	if(!( SaitekDevice && Config && Saitek::Initialized ))
 		return;
 	FIPConfig *Config = (FIPConfig *) this->Config;
-
+	
 	Saitek::DO.AddPage( SaitekDevice, 0, NULL, FLAG_SET_AS_ACTIVE );
 	Saitek::DO.SetImage( SaitekDevice, 0, 0, 0, NULL );
-
+	
 	for( int led = 0; led < 7; led ++ )
 	{
 		Saitek::DO.SetLed( SaitekDevice, 0, led, 1 );
 		Saitek::DO.SetLed( SaitekDevice, 0, led, 0 );
+		LEDState[ 0 ][ led ] = false;
 	}
-
+	
 	RegisterCallbacks();
 }
 
@@ -60,7 +60,7 @@ void FIPInstance::Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^
 	using namespace System::Drawing;
 	Graphics ^gfx = Bmp.GetGraphics();
 	gfx->Clear( Color::Black );
-
+	
 	// Draw the currently-selected page.
 	if( (SelectedPage >= 0) && (SelectedPage < (int) Config->Pages.size()) )
 	{
@@ -74,8 +74,8 @@ void FIPInstance::Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^
 	// Draw button labels.
 	Brush ^label_brush = Saitek::Output.DrawTools[SaitekDevice].GetBrush( Color::LightGray );
 	Brush ^selected_label_brush = Saitek::Output.DrawTools[SaitekDevice].GetBrush( Color::White );
-	Font ^label_font = gcnew Font( FontFamily::GenericSansSerif, 10.f, FontStyle::Regular );
-	Font ^selected_label_font = gcnew Font( FontFamily::GenericSansSerif, 10.f, FontStyle::Bold );
+	Font ^label_font = Saitek::Output.DrawTools[SaitekDevice].GetFont( FontFamily::GenericSansSerif, 11, FontStyle::Regular );
+	Font ^selected_label_font = Saitek::Output.DrawTools[SaitekDevice].GetFont( FontFamily::GenericSansSerif, 11, FontStyle::Bold );
 	for( size_t page_num = 0; page_num < Config->Pages.size(); page_num ++ )
 	{
 		FIPPage *page = Config->Pages.at( page_num );
@@ -86,22 +86,19 @@ void FIPInstance::Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^
 			brush = selected_label_brush;
 			font = selected_label_font;
 		}
-		gfx->DrawString( gcnew System::String( page->Label.c_str() ), font, brush, 4.f, 3.f + page_num * 43 );
+		gfx->DrawString( gcnew System::String( page->Label.c_str() ), font, brush, 2.f, 3.f + page_num * 44 );
 
 		// Set LED status based on each page.
 		if( page_num < 6 )
 		{
 			page->LED.SetIndices( page_num + 1, -1 );
-			page->LED.ApplyLook( fd, total_time, SaitekDevice, 0 );
+			page->LED.ApplyLook( fd, total_time, this, 0 );
 		}
 	}
-	delete label_font;
-	delete selected_label_font;
 	
 	// Set other LEDs.
-	Saitek::DO.SetLed( SaitekDevice, 0, 0, true );
 	for( int led = Config->Pages.size() + 1; led <= 6; led ++ )
-		Saitek::DO.SetLed( SaitekDevice, 0, led, false );
+		SetLED( 0, led, false );
 	
 	// Update the FIP image display.
 	Saitek::DO.SetImage( SaitekDevice, 0, 0, 320*240*3, Bmp.GetBuffer() );
@@ -382,9 +379,7 @@ void FIPConfig::LoadLine( std::vector<std::string> cmd_tokens )
 		int x = atoi( cmd_tokens[ 4 ].c_str() );
 		int y = atoi( cmd_tokens[ 5 ].c_str() );
 		
-		System::Drawing::Font ^font = gcnew System::Drawing::Font( System::Drawing::FontFamily::GenericMonospace, 12.f, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Pixel );
-		System::Drawing::Brush ^brush = gcnew System::Drawing::SolidBrush( System::Drawing::Color::White );
-		Pages[ screen ]->Layers.push_back( new FIPText( text, x, y, font, brush ) );
+		Pages[ screen ]->Layers.push_back( new FIPText( text, x, y ) );
 	}
 	else if( (cmd == "bind") && (cmd_tokens.size() >= 5) )
 	{
@@ -461,6 +456,12 @@ void FIPConfig::SaveLines( FILE *config_file )
 	}
 }
 
+bool FIPConfig::NeedsTex( void )
+{
+	// FIXME: Only return true if the current view uses any shared texture data.
+	return true;
+}
+
 
 FIPPage::FIPPage( std::string label )
 {
@@ -502,14 +503,12 @@ void FIPImage::Draw( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, 
 }
 
 
-FIPText::FIPText( int type, int x, int y, System::Drawing::Font ^font, System::Drawing::Brush ^brush )
+FIPText::FIPText( int type, int x, int y )
 {
 	Class = FIPLayerClass::Text;
 	Type = type;
 	X = x;
 	Y = y;
-	TextFont = font;
-	TextBrush = brush;
 }
 
 FIPText::~FIPText()
@@ -518,5 +517,8 @@ FIPText::~FIPText()
 
 void FIPText::Draw( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, System::Drawing::Graphics ^gfx, double total_time, void *device )
 {
-	Saitek::Output.DrawText( fd, Type, total_time, device, X, Y, gfx, TextFont.get(), TextBrush.get() );
+	System::Drawing::Font ^font = Saitek::Output.DrawTools[device].GetFont( System::Drawing::FontFamily::GenericMonospace, 12, System::Drawing::FontStyle::Regular );
+	System::Drawing::Brush ^brush = Saitek::Output.DrawTools[device].GetBrush( System::Drawing::Color::White );
+	
+	Saitek::Output.DrawText( fd, Type, total_time, device, X, Y, gfx, font, brush );
 }

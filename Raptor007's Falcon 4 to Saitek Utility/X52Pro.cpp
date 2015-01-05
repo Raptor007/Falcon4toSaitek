@@ -8,7 +8,6 @@
 
 X52ProInstance::X52ProInstance( void *saitek_device, X52ProConfig *config ) : DeviceInstance( saitek_device, config, DeviceType_X52Pro )
 {
-	SelectedPage = 0;
 }
 
 X52ProInstance::~X52ProInstance()
@@ -36,14 +35,21 @@ void X52ProInstance::Begin( void )
 		if( page_num == SelectedPage )
 			flags = FLAG_SET_AS_ACTIVE;
 		Saitek::DO.AddPage( SaitekDevice, page_num, NULL, flags );
-
+		
 		for( int led = 0; led < 20; led ++ )
 		{
 			Saitek::DO.SetLed( SaitekDevice, page_num, led, 1 );
 			Saitek::DO.SetLed( SaitekDevice, page_num, led, 0 );
+			LEDState[ page_num ][ led ] = false;
+		}
+		
+		for( int line = 0; line < 3; line ++ )
+		{
+			MFDState[ page_num ][ line ] = (wchar_t*) malloc( 32*sizeof(wchar_t) );
+			memset( MFDState[ page_num ][ line ], 0, 32*sizeof(wchar_t) );
 		}
 	}
-
+	
 	RegisterCallbacks();
 }
 
@@ -57,6 +63,14 @@ void X52ProInstance::End( void )
 		Saitek::DO.RemovePage( SaitekDevice, page_num );
 	
 	UnregisterCallbacks();
+	
+	// Memory cleanup.
+	for( std::map< int, std::map<int,wchar_t*> >::iterator mfd_page_iter = MFDState.begin(); mfd_page_iter != MFDState.end(); mfd_page_iter ++ )
+		for( std::map<int,wchar_t*>::iterator mfd_line_iter = mfd_page_iter->second.begin(); mfd_line_iter != mfd_page_iter->second.end(); mfd_line_iter ++ )
+			free( mfd_line_iter->second );
+	
+	LEDState.clear();
+	MFDState.clear();
 }
 
 void X52ProInstance::Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, double total_time )
@@ -71,8 +85,16 @@ void X52ProInstance::Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitma
 	
 	for( size_t page_num = 0; page_num < page_count; page_num ++ )
 	{
+		bool force_update = false;
+		std::set<int>::iterator need_refresh = PagesNeedRefresh.find( page_num );
+		if( need_refresh != PagesNeedRefresh.end() )
+		{
+			force_update = true;
+			PagesNeedRefresh.erase( need_refresh );
+		}
+		
 		for( int led = 0; led < 11; led ++ )
-			Config->LEDs[ led ].ApplyLook( fd, total_time, SaitekDevice, page_num );
+			Config->LEDs[ led ].ApplyLook( fd, total_time, this, page_num, force_update );
 
 		if( page_num < Config->Pages.size() )
 		{
@@ -82,14 +104,32 @@ void X52ProInstance::Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitma
 				wchar_t buffer[ 32 ] = L"";
 				memset( buffer, 0, 32*sizeof(wchar_t) );
 				Saitek::Output.FormatText( fd, page->Texts[ line ], total_time, SaitekDevice, buffer, 32 );
-				Saitek::DO.SetString( SaitekDevice, page_num, line, wcslen(buffer), buffer );
+				SetMFD( page_num, line, buffer, force_update );
 			}
 		}
 		else
 		{
 			for( int line = 0; line < 3; line ++ )
-				Saitek::DO.SetString( SaitekDevice, page_num, line, wcslen(L""), L"" );
+				SetMFD( page_num, line, L"", force_update );
 		}
+	}
+}
+
+void X52ProInstance::SetLED( int page_num, int led, bool value, bool force )
+{
+	if( force || ((page_num == SelectedPage) && (value != LEDState[ page_num ][ led ])) )
+	{
+		Saitek::DO.SetLed( SaitekDevice, page_num, led, value );
+		LEDState[ page_num ][ led ] = value;
+	}
+}
+
+void X52ProInstance::SetMFD( int page_num, int line, const wchar_t *value, bool force )
+{
+	if( force || ((page_num == SelectedPage) && (wcscmp( value, MFDState[ page_num ][ line ] ) != 0)) )
+	{
+		Saitek::DO.SetString( SaitekDevice, page_num, line, wcslen(value), value );
+		memcpy( MFDState[ page_num ][ line ], value, 32*sizeof(wchar_t) );
 	}
 }
 
@@ -259,7 +299,7 @@ void X52ProConfig::Clear( void )
 {
 	DeviceConfig::Clear();
 	
-	SleepMs = 100;
+	SleepMs = 120;
 	
 	LEDs[ X52ProLEDNum::Fire ].DefaultLook.Color = LEDColor::On;
 	LEDs[ X52ProLEDNum::Fire ].Conditions.clear();

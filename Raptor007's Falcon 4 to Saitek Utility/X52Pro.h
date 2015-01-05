@@ -65,7 +65,7 @@ namespace X52ProLEDID
 class X52ProInstance : public DeviceInstance
 {
 public:
-	int SelectedPage;
+	std::map< int, std::map<int,wchar_t*> > MFDState;
 	
 	X52ProInstance( void *saitek_device, X52ProConfig *config );
 	virtual ~X52ProInstance();
@@ -76,6 +76,8 @@ public:
 	void End( void );
 	
 	void Update( F4SharedMem::FlightData ^fd, System::Drawing::Bitmap ^tex, double total_time );
+	void SetLED( int page_num, int led, bool value, bool force = false );
+	void SetMFD( int page_num, int line, const wchar_t *value, bool force = false );
 	
 	void ChangedButton( DWORD button, bool state );
 	

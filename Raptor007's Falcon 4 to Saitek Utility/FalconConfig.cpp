@@ -8,7 +8,7 @@
 
 FalconConfig::FalconConfig( void )
 {
-	FalconType = F4SharedMem::FalconDataFormats::AlliedForce;
+	FalconType = F4SharedMem::FalconDataFormats::BMS4;
 	WaitForFalcon = false;
 	AutoLaunch = false;
 	FalconParameters[ F4SharedMem::FalconDataFormats::AlliedForce ] = "-g5";
@@ -50,8 +50,7 @@ void FalconConfig::Load( void )
 						float min_version = atof( cmd_vec[1].c_str() );
 						if( (min_version - 0.0001f) > Saitek::Version )
 						{
-							// FIXME: Be more descriptive.
-							System::Windows::Forms::MessageBox::Show( "Couldn't load: settings.cfg", "Couldn't Load Settings", System::Windows::Forms::MessageBoxButtons::OK, System::Windows::Forms::MessageBoxIcon::Error );
+							System::Windows::Forms::MessageBox::Show( "Couldn't load settings.cfg from incompatible version.", "Couldn't Load Settings", System::Windows::Forms::MessageBoxButtons::OK, System::Windows::Forms::MessageBoxIcon::Error );
 							break;
 						}
 					}

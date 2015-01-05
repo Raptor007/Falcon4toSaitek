@@ -5,46 +5,57 @@ DeviceThread::DeviceThread( DeviceInstance *instance, FalconThread ^master_threa
 {
 	Instance = instance;
 	MasterThread = master_thread;
-	FD = master_thread->FD;
-	SleepMs = 1000;
+	
+	SleepMs = 120;
 	if( instance->Config )
 		SleepMs = instance->Config->SleepMs;
+	
+	FD = master_thread->FD;
+	Tex = master_thread->Tex;
+	TexCopy = nullptr;
 }
 
 void DeviceThread::Code( void )
 {
 	MasterThread->ChildThreads ++;
 	Instance->Begin();
-
+	
 	Clock run_timer;
+	double start_ms = 0.;
+	
 	while( MasterThread->Running )
 	{
+		start_ms = run_timer.ElapsedMilliseconds();
+		
 		if( MasterThread->FalconRunning )
 		{
-			try
+			FD = MasterThread->FD;
+			if( (Instance->Config) && (Instance->Config->NeedsTex()) && (Tex != MasterThread->Tex) )
 			{
-				MasterThread->FDLock.AcquireReaderLock( 100 );
-				if( MasterThread->FDLock.IsReaderLockHeld )
+				if( MasterThread->TexLock.WaitOne() )
 				{
-					FD = MasterThread->FD;
 					Tex = MasterThread->Tex;
-					
-					MasterThread->FDLock.ReleaseLock();
+					delete TexCopy;
+					TexCopy = Tex ? gcnew System::Drawing::Bitmap(Tex) : nullptr;
+					MasterThread->TexLock.ReleaseMutex();
 				}
 			}
-			catch( ... ){}
 		}
-
+		
 		if( MasterThread->FalconRunning || (! MasterThread->Config.WaitForFalcon) )
 		{
 			if( MasterThread->DoDeviceUpdates )
-				Instance->Update( MasterThread->FD, MasterThread->Tex, run_timer.ElapsedSeconds() );
-			System::Threading::Thread::Sleep( SleepMs );
+				Instance->Update( FD, TexCopy, run_timer.ElapsedSeconds() );
+			
+			if( Instance->Config )
+				SleepMs = Instance->Config->SleepMs;
+			
+			System::Threading::Thread::Sleep( System::Math::Max( 1, SleepMs - (int)( run_timer.ElapsedMilliseconds() - start_ms) ) );
 		}
 		else
 			System::Threading::Thread::Sleep( 1000 );
 	}
-
+	
 	Instance->End();
 	MasterThread->ChildThreads --;
 }
